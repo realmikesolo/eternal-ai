@@ -1,0 +1,45 @@
+{
+  "name": "eternal-ai",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "mocha 'test/**/*.test.ts'",
+    "migration:cli": "typeorm-ts-node-commonjs -d ./src/core/db/typeorm.config.ts",
+    "migration:generate": "npm run migration:cli migration:generate",
+    "migration:run": "npm run migration:cli migration:run",
+    "migration:revert": "npm run migration:cli migration:revert",
+    "migration:show": "npm run migration:cli migration:show",
+    "migration:create": "typeorm-ts-node-commonjs migration:create"
+  },
+  "devDependencies": {
+    "@hibanka/eslint-config": "^3.4.0",
+    "@hibanka/prettier-config": "^3.4.0",
+    "@hibanka/ts-config": "^3.4.0",
+    "@types/bcrypt": "^5.0.0",
+    "@types/chai": "^4.3.1",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^16.11.47",
+    "chai": "^4.3.6",
+    "eslint": "^8.21.0",
+    "mocha": "^10.0.0",
+    "prettier": "^2.7.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "@fastify/cors": "^8.2.1",
+    "@fastify/swagger": "^8.3.1",
+    "@hibanka/pg-utils": "^1.1.0",
+    "bcrypt": "^5.1.0",
+    "dotenv": "^16.0.3",
+    "fastify": "^4.17.0",
+    "fluent-json-schema": "^4.1.0",
+    "jsonwebtoken": "^9.0.0",
+    "pg": "^8.10.0",
+    "typeorm": "^0.3.16"
+  }
+}
