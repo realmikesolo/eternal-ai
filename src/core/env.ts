@@ -10,4 +10,7 @@ export const Env = {
   DB_PASSWORD: process.env.DB_PASSWORD!,
   DB_DATABASE: process.env.DB_DATABASE!,
   DB_ENDPOINT_ID: process.env.DB_ENDPOINT_ID!,
+
+  SENDGRID_API_KEY: process.env.SENDGRID_API_KEY!,
+  SENDGRID_VERIFIED_EMAIL: process.env.SENDGRID_VERIFIED_EMAIL!,
 };

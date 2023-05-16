@@ -165,6 +165,144 @@ paths:
                 required:
                   - message
                   - success
+  /forgot-password-send:
+    post:
+      tags:
+        - auth
+      description: Forgot password send
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  examples:
+                    - user@example.com
+              required:
+                - email
+        required: true
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        "404":
+          description: |-
+            Available messages:
+
+            • USER_NOT_FOUND
+          content:
+            application/json:
+              schema:
+                type: object
+                description: |-
+                  Available messages:
+
+                  • USER_NOT_FOUND
+                properties:
+                  message:
+                    type: string
+                  success:
+                    type: boolean
+                required:
+                  - message
+                  - success
+  /forgot-password-change:
+    post:
+      tags:
+        - auth
+      description: Forgot password change
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  examples:
+                    - user@example.com
+                token:
+                  type: string
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 32
+                  pattern: ^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()-_=+\\|{}\[\];:,.<>\/?`~]+$
+                  examples:
+                    - password123
+              required:
+                - email
+                - token
+                - password
+        required: true
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        "403":
+          description: |-
+            Available messages:
+
+            • FORBIDDEN
+          content:
+            application/json:
+              schema:
+                type: object
+                description: |-
+                  Available messages:
+
+                  • FORBIDDEN
+                properties:
+                  message:
+                    type: string
+                  success:
+                    type: boolean
+                required:
+                  - message
+                  - success
+        "404":
+          description: |-
+            Available messages:
+
+            • USER_NOT_FOUND
+          content:
+            application/json:
+              schema:
+                type: object
+                description: |-
+                  Available messages:
+
+                  • USER_NOT_FOUND
+                properties:
+                  message:
+                    type: string
+                  success:
+                    type: boolean
+                required:
+                  - message
+                  - success
 servers:
   - url: http://localhost:3000
 tags:

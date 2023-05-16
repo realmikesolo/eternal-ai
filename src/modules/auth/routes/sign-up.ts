@@ -4,11 +4,8 @@ import { APIUserSchema, User, UserSchema } from '../models/user.model';
 import { HttpStatus } from '../../../core/server/status';
 import { Schemas } from '../../../core/utils';
 import { UserWithSuchLoginAlreadyExistsException } from '../auth.exceptions';
-import { AuthService } from '../auth.service';
 import { PgErrors } from '@hibanka/pg-utils';
 import { hash, genSalt } from 'bcrypt';
-
-const authService = new AuthService();
 
 export async function signUp(fastify: FastifyInstance): Promise<void> {
   fastify.post(
