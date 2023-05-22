@@ -303,6 +303,55 @@ paths:
                 required:
                   - message
                   - success
+  /google/auth:
+    get:
+      tags:
+        - auth
+      description: Google auth
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: code
+          required: true
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                required:
+                  - token
+        "409":
+          description: |-
+            Available messages:
+
+            • USER_WITH_SUCH_LOGIN_ALREADY_EXISTS
+          content:
+            application/json:
+              schema:
+                type: object
+                description: |-
+                  Available messages:
+
+                  • USER_WITH_SUCH_LOGIN_ALREADY_EXISTS
+                properties:
+                  message:
+                    type: string
+                  success:
+                    type: boolean
+                required:
+                  - message
+                  - success
+  /google/test:
+    get:
+      responses:
+        "200":
+          description: Default Response
 servers:
   - url: http://localhost:3000
 tags:

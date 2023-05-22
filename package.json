@@ -35,12 +35,15 @@
     "@fastify/swagger": "^8.3.1",
     "@hibanka/pg-utils": "^1.1.0",
     "@sendgrid/mail": "^7.7.0",
+    "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
     "fastify": "^4.17.0",
     "fluent-json-schema": "^4.1.0",
+    "googleapis": "^118.0.0",
     "jsonwebtoken": "^9.0.0",
     "pg": "^8.10.0",
+    "query-string": "^6.14.1",
     "redis": "^4.6.6",
     "typeorm": "^0.3.16"
   }

@@ -2,12 +2,15 @@ import { FastifyInstance, FastifyRequest } from 'fastify';
 import { User, UserSchema } from '../models/user.model';
 import S from 'fluent-json-schema';
 import { HttpStatus } from '../../../core/server/status';
-import { PasswordIsIncorrectException, UserNotFoundException } from '../auth.exceptions';
+import {
+  PasswordIsIncorrectException,
+  UserNotFoundException,
+  UserWasRegisteredWithAnotherMethod,
+} from '../auth.exceptions';
 import { compare } from 'bcrypt';
-import { sign } from 'jsonwebtoken';
-import { Env } from '../../../core/env';
 import { Schemas } from '../../../core/utils';
 import { BadRequestException } from '../../../core/server/exceptions';
+import { generateToken } from '../auth.helper';
 
 export async function signIn(fastify: FastifyInstance): Promise<void> {
   fastify.post(
@@ -43,6 +46,10 @@ export async function signIn(fastify: FastifyInstance): Promise<void> {
         throw new UserNotFoundException();
       }
 
+      if (user.method !== 'email') {
+        throw new UserWasRegisteredWithAnotherMethod();
+      }
+
       if (!(await compare(password, user.password))) {
         throw new PasswordIsIncorrectException();
       }
@@ -52,8 +59,4 @@ export async function signIn(fastify: FastifyInstance): Promise<void> {
       res.status(HttpStatus.OK).send({ token });
     },
   );
-}
-
-function generateToken(user: User): string {
-  return sign({ id: user.id }, Env.JWT_SECRET, { expiresIn: '1d' });
 }

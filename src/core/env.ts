@@ -13,4 +13,9 @@ export const Env = {
 
   SENDGRID_API_KEY: process.env.SENDGRID_API_KEY!,
   SENDGRID_VERIFIED_EMAIL: process.env.SENDGRID_VERIFIED_EMAIL!,
+
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET!,
+
+  CLIENT_URL: process.env.CLIENT_URL!,
 };

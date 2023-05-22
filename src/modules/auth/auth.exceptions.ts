@@ -18,3 +18,9 @@ export class PasswordIsIncorrectException extends HttpException {
     super(HttpStatus.BAD_REQUEST, { message: 'PASSWORD_IS_INCORRECT', success: false });
   }
 }
+
+export class UserWasRegisteredWithAnotherMethod extends HttpException {
+  constructor() {
+    super(HttpStatus.BAD_REQUEST, { message: 'USER_WAS_REGISTERED_WITH_ANOTHER_METHOD', success: false });
+  }
+}

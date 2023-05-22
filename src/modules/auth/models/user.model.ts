@@ -9,8 +9,14 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', length: 255, unique: true })
   public email: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   public password: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  public name: string;
+
+  @Column({ type: 'enum', enum: ['email', 'google'], default: 'email' })
+  public method: RegisterMethod;
 }
 
 export const UserSchema = {
@@ -32,3 +38,5 @@ export interface APIUser {
 export const APIUserSchema = (): ObjectSchema => {
   return S.object().prop('id', UserSchema.id.required()).prop('email', UserSchema.email.required());
 };
+
+type RegisterMethod = 'email' | 'google';
