@@ -7,7 +7,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "mocha 'test/**/*.test.ts'",
-    "migration:cli": "typeorm-ts-node-commonjs -d ./src/core/db/typeorm.config.ts",
+    "migration:cli": "typeorm-ts-node-commonjs -d ./src/configs/typeorm.config.ts",
     "migration:generate": "npm run migration:cli migration:generate",
     "migration:run": "npm run migration:cli migration:run",
     "migration:revert": "npm run migration:cli migration:revert",

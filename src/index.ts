@@ -1,10 +1,9 @@
 import 'dotenv/config';
-
-import { startServer } from './core/server/server';
-import { authRouter } from './modules/auth/auth.router';
-import { Env } from './core/env';
-import { connectDB } from './core/db/db';
-import { connectRedis } from './core/db/redis';
+import { userRouter } from './routes/user.router';
+import { startServer } from './server';
+import { Env } from './shared/env';
+import { connectDB } from './adapters/db';
+import { connectRedis } from './adapters/redis';
 
 (async () => {
   await connectDB();
@@ -12,6 +11,6 @@ import { connectRedis } from './core/db/redis';
   await startServer({
     host: '0.0.0.0',
     port: Env.SERVER_PORT,
-    routes: [authRouter],
+    routes: [userRouter],
   });
 })();

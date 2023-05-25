@@ -1,9 +1,9 @@
 import Fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { HttpException, BadRequestException, InternalServerErrorException } from './exceptions';
-import { HttpStatus } from './status';
+import { HttpException, BadRequestException, InternalServerErrorException } from './exceptions/exceptions';
+import { HttpStatus } from './shared/status';
 import { writeFile } from 'node:fs/promises';
 import path = require('path');
-import { Env } from '../env';
+import { Env } from './shared/env';
 
 export async function startServer(options: {
   host: string;

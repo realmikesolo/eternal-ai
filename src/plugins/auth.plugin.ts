@@ -1,7 +1,7 @@
 import { FastifyRequest } from 'fastify';
-import { UnauthorizedException } from '../../core/server/exceptions';
+import { UnauthorizedException } from '../exceptions/exceptions';
 import { JwtPayload, verify } from 'jsonwebtoken';
-import { Env } from '../../core/env';
+import { Env } from '../shared/env';
 
 export async function authMiddleware(req: FastifyRequest): Promise<void> {
   try {

@@ -1,5 +1,5 @@
 import S, { ObjectSchema } from 'fluent-json-schema';
-import { HttpException } from './server/exceptions';
+import { HttpException } from '../exceptions/exceptions';
 
 export const Schemas = {
   exception: (...exceptions: Array<new () => HttpException>): ObjectSchema =>

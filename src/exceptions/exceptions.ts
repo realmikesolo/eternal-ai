@@ -1,4 +1,4 @@
-import { HttpStatus } from './status';
+import { HttpStatus } from '../shared/status';
 
 export class HttpException extends Error {
   public readonly status: number;

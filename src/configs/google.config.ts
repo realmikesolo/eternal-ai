@@ -1,5 +1,5 @@
 import { google } from 'googleapis';
-import { Env } from '../env';
+import { Env } from '../shared/env';
 
 export const oauth2Client = new google.auth.OAuth2(
   Env.GOOGLE_CLIENT_ID,

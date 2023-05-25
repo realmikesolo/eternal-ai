@@ -1,5 +1,5 @@
-import { HttpException } from '../../core/server/exceptions';
-import { HttpStatus } from '../../core/server/status';
+import { HttpException } from './exceptions';
+import { HttpStatus } from '../shared/status';
 
 export class UserWithSuchLoginAlreadyExistsException extends HttpException {
   constructor() {
