@@ -8,7 +8,6 @@ app_environment:
   SERVER_PORT: 5500
   REDIS_HOST: "redis-eternal"
   REDIS_PORT: 6379
-  REDIS_PASSWORD: "iufgyhujiko23"
   STAGE: "dev"
   DB_HOST: "{{ DB_HOST }}"
   DB_USER: "{{ DB_USER }}"

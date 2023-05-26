@@ -5,7 +5,7 @@ services:
     hostname: 'redis-eternal'
     image: 'redis:6.2-alpine'
     restart: 'always'
-    entrypoint: 'redis-server --requirepass ${REDIS_PASSWORD} --maxmemory 1024mb --maxmemory-policy allkeys-lru'
+    entrypoint: 'redis-server --maxmemory 1024mb --maxmemory-policy allkeys-lru'
     expose:
       - '6379'
     volumes:
