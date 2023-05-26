@@ -36,3 +36,4 @@ jobs:
             --extra-vars "SENDGRID_VERIFIED_EMAIL=${{ secrets.SENDGRID_VERIFIED_EMAIL }}"
             --extra-vars "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}"
             --extra-vars "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}"
+            --extra-vars "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}"
