@@ -5,15 +5,13 @@ services:
     hostname: 'redis-eternal'
     image: 'redis:6.2-alpine'
     restart: 'always'
-    ports:
-      - '6379:6379'
+    entrypoint: 'redis-server --requirepass ${REDIS_PASSWORD} --maxmemory 1024mb --maxmemory-policy allkeys-lru'
+    expose:
+      - '6379'
     volumes:
       - 'redis-eternal:/data'
     networks:
       - 'eternal-ai'
-    environment:
-      REDIS_HOST: '${REDIS_HOST}'
-      REDIS_PORT: '${REDIS_PORT}'
   app:
     hostname: 'eternal-ai'
     build: '.'
