@@ -52,3 +52,6 @@ networks:
   eternal-ai:
   infrastructure-traefik:
     external: true
+
+volumes:
+  redis-eternal:
