@@ -1,0 +1,41 @@
+---
+- hosts: all
+  gather_facts: false
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Sync source
+      ansible.builtin.synchronize:
+        src: "../../{{ service_name }}"
+        dest: "{{ remote_dir_path }}"
+        delete: true
+        rsync_opts:
+          - "--chmod=Du=rwx,Dg=rx,Do=x,Fu=rw,Fg=r,Fo="
+
+    - name: Run Docker compose (scale up)
+      ansible.builtin.include_tasks:
+        file: tasks/run-docker-compose.yml
+      vars:
+        scale: 2
+
+    - name: Sleep for a moment
+      ansible.builtin.pause:
+        seconds: "{{ docker_scaling_timeout }}"
+
+    - name: Get old container ID
+      ansible.builtin.shell: docker ps | grep '{{ category_name }}-{{ service_name }}_app' | awk '{print $1}' | tail -n 1
+      register: old_container_id
+
+    - name: Remove old container
+      community.docker.docker_container:
+        name: "{{ old_container_id.stdout }}"
+        state: absent
+      when: old_container_id.stdout is defined
+
+    - name: Run Docker compose (scale down)
+      ansible.builtin.include_tasks:
+        file: tasks/run-docker-compose.yml
+      vars:
+        scale: 1

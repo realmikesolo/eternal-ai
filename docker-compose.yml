@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  redis-eternal:
+    hostname: 'redis-eternal'
+    image: 'redis:6.2-alpine'
+    restart: 'always'
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'redis-eternal:/data'
+    networks:
+      - 'eternal-ai'
+    environment:
+      REDIS_HOST: '${REDIS_HOST}'
+      REDIS_PORT: '${REDIS_PORT}'
+  app:
+    hostname: 'eternal-ai'
+    build: '.'
+    environment:
+      STAGE: '${STAGE}'
+      SERVER_PORT: '${SERVER_PORT}'
+      DB_HOST: '${DB_HOST}'
+      DB_USER: '${DB_USER}'
+      DB_PASSWORD: '${DB_PASSWORD}'
+      DB_DATABASE: '${DB_DATABASE}'
+      DB_ENDPOINT_ID: '${DB_ENDPOINT_ID}'
+      JWT_SECRET: '${JWT_SECRET}'
+      SENDGRID_API_KEY: '${SENDGRID_API_KEY}'
+      SENDGRID_VERIFIED_EMAIL: '${SENDGRID_VERIFIED_EMAIL}'
+      GOOGLE_CLIENT_ID: '${GOOGLE_CLIENT_ID}'
+      GOOGLE_CLIENT_SECRET: '${GOOGLE_CLIENT_SECRET}'
+    depends_on:
+      - 'redis-eternal'
+    networks:
+      - 'infrastructure-traefik'
+      - 'eternal-ai'
+    labels:
+      - 'traefik.enable=false'
+      - 'traefik.http.routers.eternal-ai.rule=Host(`178.18.254.186`)'
+      - 'traefik.http.routers.eternal-ai.entrypoints=websecure'
+      - 'traefik.http.routers.eternal-ai.tls=true'
+      - 'traefik.http.routers.eternal-ai.tls.certresolver=le'
+      - 'traefik.docker.network=infrastructure-traefik'
+    ports:
+      - '${SERVER_PORT}:${SERVER_PORT}'
+    restart: 'unless-stopped'
+
+networks:
+  eternal-ai:
+  infrastructure-traefik:
+    external: true

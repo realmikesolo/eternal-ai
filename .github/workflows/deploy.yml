@@ -1,0 +1,38 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "*.md"
+      - "test/**"
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run Playbook
+        uses: dawidd6/action-ansible-playbook@f2818df92e0627f4a84ef72e307a663a90ba764c
+        with:
+          playbook: ansible/main.yml
+          key: ${{ secrets.ANSIBLE_PRIVATE_SSH_KEY }}
+          inventory: |
+            [dev_infrastructure]
+            linux1   ansible_host=${{ secrets.ANSIBLE_HOST }}   ansible_port=${{ secrets.ANSIBLE_PORT }}   ansible_user=ansible
+          options: |
+            --extra-vars "DB_PASSWORD=${{ secrets.DB_PASSWORD }}"
+            --extra-vars "DB_DATABASE=${{ secrets.DB_DATABASE }}"
+            --extra-vars "DB_USER=${{ secrets.DB_USER }}"
+            --extra-vars "DB_HOST=${{ secrets.DB_HOST }}"
+            --extra-vars "DB_ENDPOINT_ID=${{ secrets.DB_ENDPOINT_ID }}"
+            --extra-vars "JWT_SECRET=${{ secrets.JWT_SECRET }}"
+            --extra-vars "SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }}"
+            --extra-vars "SENDGRID_VERIFIED_EMAIL=${{ secrets.SENDGRID_VERIFIED_EMAIL }}"
+            --extra-vars "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}"
+            --extra-vars "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}"

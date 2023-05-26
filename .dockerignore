@@ -1,0 +1,8 @@
+*.log
+Dockerfile
+.dockerignore
+node_modules
+.build
+
+.vscode
+.idea

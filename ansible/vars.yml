@@ -1,0 +1,21 @@
+category_name: services
+service_name: eternal-ai
+remote_dir_path: /home/{{ ansible_user }}/{{ category_name }}
+
+docker_scaling_timeout: 7
+
+app_environment:
+  SERVER_PORT: 5500
+  REDIS_HOST: "redis-eternal"
+  REDIS_PORT: 6379
+  STAGE: "dev"
+  DB_HOST: "{{ DB_HOST }}"
+  DB_USER: "{{ DB_USER }}"
+  DB_PASSWORD: "{{ DB_PASSWORD }}"
+  DB_DATABASE: "{{ DB_DATABASE }}"
+  DB_ENDPOINT_ID: "{{ DB_ENDPOINT_ID }}"
+  JWT_SECRET: "{{ JWT_SECRET }}"
+  SENDGRID_API_KEY: "{{ SENDGRID_API_KEY }}"
+  SENDGRID_VERIFIED_EMAIL: "{{ SENDGRID_VERIFIED_EMAIL }}"
+  GOOGLE_CLIENT_ID: "{{ GOOGLE_CLIENT_ID }}"
+  GOOGLE_CLIENT_SECRET: "{{ GOOGLE_CLIENT_SECRET }}"
