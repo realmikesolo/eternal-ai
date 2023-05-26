@@ -30,6 +30,8 @@ services:
       SENDGRID_VERIFIED_EMAIL: '${SENDGRID_VERIFIED_EMAIL}'
       GOOGLE_CLIENT_ID: '${GOOGLE_CLIENT_ID}'
       GOOGLE_CLIENT_SECRET: '${GOOGLE_CLIENT_SECRET}'
+      REDIS_HOST: '${REDIS_HOST}'
+      REDIS_PORT: '${REDIS_PORT}'
     depends_on:
       - 'redis-eternal'
     networks:
