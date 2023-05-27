@@ -30,6 +30,7 @@ services:
       GOOGLE_CLIENT_SECRET: '${GOOGLE_CLIENT_SECRET}'
       REDIS_HOST: '${REDIS_HOST}'
       REDIS_PORT: '${REDIS_PORT}'
+      REDIS_PASSWORD: '${REDIS_PASSWORD}'
     depends_on:
       - 'redis-eternal'
     networks:
