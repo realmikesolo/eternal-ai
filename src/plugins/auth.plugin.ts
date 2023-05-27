@@ -1,5 +1,5 @@
 import { FastifyRequest } from 'fastify';
-import { UnauthorizedException } from '../exceptions/exceptions';
+import { UnauthorizedException } from '../exceptions/http.exception';
 import { JwtPayload, verify } from 'jsonwebtoken';
 import { Env } from '../shared/env';
 

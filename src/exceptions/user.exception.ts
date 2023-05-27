@@ -1,4 +1,4 @@
-import { HttpException } from './exceptions';
+import { HttpException } from './http.exception';
 import { HttpStatus } from '../shared/status';
 
 export class UserWithSuchLoginAlreadyExistsException extends HttpException {

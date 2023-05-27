@@ -1,5 +1,9 @@
 import Fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { HttpException, BadRequestException, InternalServerErrorException } from './exceptions/exceptions';
+import {
+  HttpException,
+  BadRequestException,
+  InternalServerErrorException,
+} from './exceptions/http.exception';
 import { HttpStatus } from './shared/status';
 import { writeFile } from 'node:fs/promises';
 import path = require('path');

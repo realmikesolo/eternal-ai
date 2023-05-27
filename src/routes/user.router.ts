@@ -9,9 +9,9 @@ import {
   UserWasRegisteredWithAnotherMethod,
   UserWithSuchLoginAlreadyExistsException,
 } from '../exceptions/user.exception';
-import { Schemas } from '../schemas/utils';
+import { ExceptionSchemas } from '../schemas/exception.schema';
 import { HttpStatus } from '../shared/status';
-import { BadRequestException, ForbiddenException } from '../exceptions/exceptions';
+import { BadRequestException, ForbiddenException } from '../exceptions/http.exception';
 import { generateToken } from '../helpers/auth.helper';
 import axios from 'axios';
 import { oauth2Client } from '../configs/google.config';
@@ -32,7 +32,7 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
           .prop('password', UserSchema.password.required()),
         response: {
           [HttpStatus.CREATED]: APIUserSchema(),
-          [HttpStatus.CONFLICT]: Schemas.exception(UserWithSuchLoginAlreadyExistsException),
+          [HttpStatus.CONFLICT]: ExceptionSchemas.exception(UserWithSuchLoginAlreadyExistsException),
         },
       },
     },
@@ -76,8 +76,11 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
           .prop('password', UserSchema.password.required()),
         response: {
           [HttpStatus.OK]: S.object().prop('token', S.string()).required(),
-          [HttpStatus.NOT_FOUND]: Schemas.exception(UserNotFoundException),
-          [HttpStatus.BAD_REQUEST]: Schemas.exception(BadRequestException, PasswordIsIncorrectException),
+          [HttpStatus.NOT_FOUND]: ExceptionSchemas.exception(UserNotFoundException),
+          [HttpStatus.BAD_REQUEST]: ExceptionSchemas.exception(
+            BadRequestException,
+            PasswordIsIncorrectException,
+          ),
         },
       },
     },
@@ -120,7 +123,7 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
         querystring: S.object().prop('code', S.string().required()),
         response: {
           [HttpStatus.OK]: S.object().prop('token', S.string()).required(),
-          [HttpStatus.BAD_REQUEST]: Schemas.exception(UserWasRegisteredWithAnotherMethod),
+          [HttpStatus.BAD_REQUEST]: ExceptionSchemas.exception(UserWasRegisteredWithAnotherMethod),
         },
       },
     },
@@ -176,7 +179,7 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
         body: S.object().additionalProperties(false).prop('email', UserSchema.email.required()),
         response: {
           [HttpStatus.OK]: S.object().prop('message', S.string()).required(),
-          [HttpStatus.NOT_FOUND]: Schemas.exception(UserNotFoundException),
+          [HttpStatus.NOT_FOUND]: ExceptionSchemas.exception(UserNotFoundException),
         },
       },
     },
@@ -200,7 +203,7 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
       const token = Math.floor(Math.random() * 90_000) + 10_000;
 
       await Promise.all([
-        redisClient.set(`forgot-password:${email}`, token, { EX: 60 * 60 * 24 }),
+        redisClient.set(`forgot-password:${email}`, token, 'EX', 60 * 60 * 24),
         sgMail.send({
           to: email,
           from: Env.SENDGRID_VERIFIED_EMAIL,
@@ -226,8 +229,8 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
           .prop('password', UserSchema.password.required()),
         response: {
           [HttpStatus.OK]: S.object().prop('message', S.string()).required(),
-          [HttpStatus.FORBIDDEN]: Schemas.exception(ForbiddenException),
-          [HttpStatus.NOT_FOUND]: Schemas.exception(UserNotFoundException),
+          [HttpStatus.FORBIDDEN]: ExceptionSchemas.exception(ForbiddenException),
+          [HttpStatus.NOT_FOUND]: ExceptionSchemas.exception(UserNotFoundException),
         },
       },
     },
