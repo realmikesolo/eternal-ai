@@ -111,11 +111,15 @@ paths:
             application/json:
               schema:
                 type: object
+                additionalProperties: false
                 properties:
                   token:
                     type: string
+                  success:
+                    type: boolean
                 required:
                   - token
+                  - success
         "400":
           description: |-
             Available messages:
@@ -180,11 +184,15 @@ paths:
             application/json:
               schema:
                 type: object
+                additionalProperties: false
                 properties:
                   token:
                     type: string
+                  success:
+                    type: boolean
                 required:
                   - token
+                  - success
         "400":
           description: |-
             Available messages:
@@ -231,6 +239,7 @@ paths:
             application/json:
               schema:
                 type: object
+                additionalProperties: false
                 properties:
                   message:
                     type: string
@@ -291,6 +300,7 @@ paths:
             application/json:
               schema:
                 type: object
+                additionalProperties: false
                 properties:
                   message:
                     type: string
