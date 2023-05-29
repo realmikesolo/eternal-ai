@@ -12,13 +12,71 @@ export const UserSchema = {
   method: S.string().enum(['email', 'google']),
 };
 
-export const SignUpUserSchema = (): ObjectSchema => {
+const EmailAndPasswordSchema = (): ObjectSchema => {
+  return S.object()
+    .additionalProperties(false)
+    .prop('email', UserSchema.email.required())
+    .prop('password', UserSchema.password.required());
+};
+
+const TokenSchema = (): ObjectSchema => {
+  return S.object()
+    .additionalProperties(false)
+    .prop('token', S.string().required())
+    .prop('success', S.boolean().required());
+};
+
+const MessageSchema = (): ObjectSchema => {
+  return S.object().additionalProperties(false).prop('message', S.string().required());
+};
+
+export const SignUpRequestSchema = (): ObjectSchema => {
+  return EmailAndPasswordSchema();
+};
+
+export const SignUpResponseSchema = (): ObjectSchema => {
   return S.object()
     .prop('user', S.object().prop('id', UserSchema.id.required()).prop('email', UserSchema.email.required()))
     .prop('success', S.boolean().required());
 };
 
-export const GetUserAccountSchema = (): ObjectSchema => {
+export const SignInRequestSchema = (): ObjectSchema => {
+  return EmailAndPasswordSchema();
+};
+
+export const SignInResponseSchema = (): ObjectSchema => {
+  return TokenSchema();
+};
+
+export const GoogleAuthRequestSchema = (): ObjectSchema => {
+  return S.object().additionalProperties(false).prop('code', S.string().required());
+};
+
+export const GoogleAuthResponseSchema = (): ObjectSchema => {
+  return TokenSchema();
+};
+
+export const ForgotPasswordSendRequestSchema = (): ObjectSchema => {
+  return S.object().additionalProperties(false).prop('email', UserSchema.email.required());
+};
+
+export const ForgotPasswordSendResponseSchema = (): ObjectSchema => {
+  return MessageSchema();
+};
+
+export const ForgotPasswordChangeRequestSchema = (): ObjectSchema => {
+  return S.object()
+    .additionalProperties(false)
+    .prop('email', UserSchema.email.required())
+    .prop('token', S.string().required())
+    .prop('password', UserSchema.password.required());
+};
+
+export const ForgotPasswordChangeResponseSchema = (): ObjectSchema => {
+  return MessageSchema();
+};
+
+export const GetUserAccountResponseSchema = (): ObjectSchema => {
   return S.object()
     .prop(
       'user',

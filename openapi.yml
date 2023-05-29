@@ -11,7 +11,7 @@ components:
       bearerFormat: JWT
   schemas: {}
 paths:
-  /user/sign-up:
+  /sign-up:
     post:
       tags:
         - user
@@ -43,15 +43,22 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: string
-                    format: uuid
-                  email:
-                    type: string
-                    format: email
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      email:
+                        type: string
+                        format: email
+                    required:
+                      - id
+                      - email
+                  success:
+                    type: boolean
                 required:
-                  - id
-                  - email
+                  - success
         "409":
           description: |-
             Available messages:
@@ -73,7 +80,7 @@ paths:
                 required:
                   - message
                   - success
-  /user/sign-in:
+  /sign-in:
     post:
       tags:
         - user
@@ -155,7 +162,7 @@ paths:
                 required:
                   - message
                   - success
-  /user/google/auth:
+  /google/auth:
     get:
       tags:
         - user
@@ -199,7 +206,7 @@ paths:
                 required:
                   - message
                   - success
-  /user/forgot-password-send:
+  /forgot-password-send:
     post:
       tags:
         - user
@@ -250,7 +257,7 @@ paths:
                 required:
                   - message
                   - success
-  /user/forgot-password-change:
+  /forgot-password-change:
     post:
       tags:
         - user
@@ -331,7 +338,7 @@ paths:
                 required:
                   - message
                   - success
-  /user/account:
+  /account:
     get:
       tags:
         - user

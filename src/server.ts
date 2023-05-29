@@ -6,7 +6,7 @@ import {
 } from './exceptions/http.exception';
 import { HttpStatus } from './shared/status';
 import { writeFile } from 'node:fs/promises';
-import path = require('path');
+import path from 'node:path';
 import { Env } from './shared/env';
 
 export async function startServer(options: {

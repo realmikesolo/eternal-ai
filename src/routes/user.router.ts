@@ -18,7 +18,20 @@ import { redisClient } from '../adapters/redis';
 import { Env } from '../shared/env';
 import sgMail from '@sendgrid/mail';
 import { User } from '../entities/models/user.model';
-import { UserSchema, SignUpUserSchema, GetUserAccountSchema } from '../schemas/user.schema';
+import {
+  UserSchema,
+  SignUpResponseSchema,
+  GetUserAccountResponseSchema,
+  SignUpRequestSchema,
+  SignInRequestSchema,
+  SignInResponseSchema,
+  GoogleAuthResponseSchema,
+  GoogleAuthRequestSchema,
+  ForgotPasswordSendRequestSchema,
+  ForgotPasswordSendResponseSchema,
+  ForgotPasswordChangeRequestSchema,
+  ForgotPasswordChangeResponseSchema,
+} from '../schemas/user.schema';
 import { AuthRequest, authPlugin } from '../plugins/auth.plugin';
 import { UserService } from '../services/user.service';
 
@@ -31,12 +44,9 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
       schema: {
         tags: ['user'],
         description: 'Sign up',
-        body: S.object()
-          .additionalProperties(false)
-          .prop('email', UserSchema.email.required())
-          .prop('password', UserSchema.password.required()),
+        body: SignUpRequestSchema(),
         response: {
-          [HttpStatus.CREATED]: SignUpUserSchema(),
+          [HttpStatus.CREATED]: SignUpResponseSchema(),
           [HttpStatus.CONFLICT]: ExceptionSchemas.exception(UserWithSuchLoginAlreadyExistsException),
         },
       },
@@ -75,12 +85,9 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
       schema: {
         tags: ['user'],
         description: 'Sign in',
-        body: S.object()
-          .additionalProperties(false)
-          .prop('email', UserSchema.email.required())
-          .prop('password', UserSchema.password.required()),
+        body: SignInRequestSchema(),
         response: {
-          [HttpStatus.OK]: S.object().prop('token', S.string()).required(),
+          [HttpStatus.OK]: SignInResponseSchema(),
           [HttpStatus.NOT_FOUND]: ExceptionSchemas.exception(UserNotFoundException),
           [HttpStatus.BAD_REQUEST]: ExceptionSchemas.exception(
             BadRequestException,
@@ -125,9 +132,9 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
       schema: {
         tags: ['user'],
         description: 'Google auth',
-        querystring: S.object().prop('code', S.string().required()),
+        querystring: GoogleAuthRequestSchema(),
         response: {
-          [HttpStatus.OK]: S.object().prop('token', S.string()).required(),
+          [HttpStatus.OK]: GoogleAuthResponseSchema(),
           [HttpStatus.BAD_REQUEST]: ExceptionSchemas.exception(UserWasRegisteredWithAnotherMethod),
         },
       },
@@ -181,9 +188,9 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
       schema: {
         tags: ['user'],
         description: 'Forgot password send',
-        body: S.object().additionalProperties(false).prop('email', UserSchema.email.required()),
+        body: ForgotPasswordSendRequestSchema(),
         response: {
-          [HttpStatus.OK]: S.object().prop('message', S.string()).required(),
+          [HttpStatus.OK]: ForgotPasswordSendResponseSchema(),
           [HttpStatus.NOT_FOUND]: ExceptionSchemas.exception(UserNotFoundException),
         },
       },
@@ -227,13 +234,9 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
       schema: {
         tags: ['user'],
         description: 'Forgot password change',
-        body: S.object()
-          .additionalProperties(false)
-          .prop('email', UserSchema.email.required())
-          .prop('token', S.string().required())
-          .prop('password', UserSchema.password.required()),
+        body: ForgotPasswordChangeRequestSchema(),
         response: {
-          [HttpStatus.OK]: S.object().prop('message', S.string()).required(),
+          [HttpStatus.OK]: ForgotPasswordChangeResponseSchema(),
           [HttpStatus.FORBIDDEN]: ExceptionSchemas.exception(ForbiddenException),
           [HttpStatus.NOT_FOUND]: ExceptionSchemas.exception(UserNotFoundException),
         },
@@ -278,7 +281,7 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
         description: 'Get account',
         security: [{ bearer: [] }],
         response: {
-          [HttpStatus.OK]: GetUserAccountSchema(),
+          [HttpStatus.OK]: GetUserAccountResponseSchema(),
           [HttpStatus.UNAUTHORIZED]: ExceptionSchemas.exception(UnauthorizedException),
           [HttpStatus.NOT_FOUND]: ExceptionSchemas.exception(UserNotFoundException),
         },
