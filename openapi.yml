@@ -243,8 +243,11 @@ paths:
                 properties:
                   message:
                     type: string
+                  success:
+                    type: boolean
                 required:
                   - message
+                  - success
         "404":
           description: |-
             Available messages:
@@ -304,8 +307,11 @@ paths:
                 properties:
                   message:
                     type: string
+                  success:
+                    type: boolean
                 required:
                   - message
+                  - success
         "403":
           description: |-
             Available messages:

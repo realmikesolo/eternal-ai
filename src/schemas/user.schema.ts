@@ -27,7 +27,10 @@ const TokenSchema = (): ObjectSchema => {
 };
 
 const MessageSchema = (): ObjectSchema => {
-  return S.object().additionalProperties(false).prop('message', S.string().required());
+  return S.object()
+    .additionalProperties(false)
+    .prop('message', S.string().required())
+    .prop('success', S.boolean().required());
 };
 
 export const SignUpRequestSchema = (): ObjectSchema => {
