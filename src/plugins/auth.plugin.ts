@@ -2,8 +2,9 @@ import { FastifyRequest } from 'fastify';
 import { UnauthorizedException } from '../exceptions/http.exception';
 import { JwtPayload, verify } from 'jsonwebtoken';
 import { Env } from '../shared/env';
+import { User } from '../entities/models/user.model';
 
-export async function authMiddleware(req: FastifyRequest): Promise<void> {
+export async function authPlugin(req: FastifyRequest): Promise<void> {
   try {
     const [type, token] = (req.headers.authorization ?? '').split(' ');
 
@@ -20,3 +21,5 @@ export async function authMiddleware(req: FastifyRequest): Promise<void> {
     throw new UnauthorizedException();
   }
 }
+
+export type AuthRequest = FastifyRequest & { user: User };

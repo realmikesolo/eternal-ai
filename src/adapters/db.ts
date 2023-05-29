@@ -11,7 +11,7 @@ export async function connectDB(): Promise<void> {
     url,
     ssl: true,
     logging: true,
-    entities: [resolve(__dirname, '../models/*.model.{ts,js}')],
+    entities: [resolve(__dirname, '../entities/models/*.model.{ts,js}')],
     migrations: [resolve(__dirname, '../migrations/*.{ts,js}')],
     migrationsRun: true,
   });

@@ -9,7 +9,7 @@ export default new DataSource({
   type: 'postgres',
   url,
   ssl: true,
-  entities: [resolve(__dirname, '../models/*.model.{ts,js}')],
+  entities: [resolve(__dirname, '../entities/models/*.model.{ts,js}')],
   migrations: [resolve(__dirname, '../migrations/*.{ts,js}')],
   migrationsRun: true,
 });

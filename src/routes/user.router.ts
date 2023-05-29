@@ -1,5 +1,4 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
-import { APIUserSchema, User, UserSchema } from '../models/user.model';
 import { PgErrors } from '@hibanka/pg-utils';
 import { hash, genSalt, compare } from 'bcrypt';
 import S from 'fluent-json-schema';
@@ -11,27 +10,33 @@ import {
 } from '../exceptions/user.exception';
 import { ExceptionSchemas } from '../schemas/exception.schema';
 import { HttpStatus } from '../shared/status';
-import { BadRequestException, ForbiddenException } from '../exceptions/http.exception';
+import { BadRequestException, ForbiddenException, UnauthorizedException } from '../exceptions/http.exception';
 import { generateToken } from '../helpers/auth.helper';
 import axios from 'axios';
 import { oauth2Client } from '../configs/google.config';
 import { redisClient } from '../adapters/redis';
 import { Env } from '../shared/env';
 import sgMail from '@sendgrid/mail';
+import { User } from '../entities/models/user.model';
+import { UserSchema, SignUpUserSchema, GetUserAccountSchema } from '../schemas/user.schema';
+import { AuthRequest, authPlugin } from '../plugins/auth.plugin';
+import { UserService } from '../services/user.service';
+
+const userService = new UserService();
 
 export async function userRouter(fastify: FastifyInstance): Promise<void> {
   fastify.post(
     '/sign-up',
     {
       schema: {
-        tags: ['auth'],
+        tags: ['user'],
         description: 'Sign up',
         body: S.object()
           .additionalProperties(false)
           .prop('email', UserSchema.email.required())
           .prop('password', UserSchema.password.required()),
         response: {
-          [HttpStatus.CREATED]: APIUserSchema(),
+          [HttpStatus.CREATED]: SignUpUserSchema(),
           [HttpStatus.CONFLICT]: ExceptionSchemas.exception(UserWithSuchLoginAlreadyExistsException),
         },
       },
@@ -68,7 +73,7 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
     '/sign-in',
     {
       schema: {
-        tags: ['auth'],
+        tags: ['user'],
         description: 'Sign in',
         body: S.object()
           .additionalProperties(false)
@@ -118,7 +123,7 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
     '/google/auth',
     {
       schema: {
-        tags: ['auth'],
+        tags: ['user'],
         description: 'Google auth',
         querystring: S.object().prop('code', S.string().required()),
         response: {
@@ -174,7 +179,7 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
     '/forgot-password-send',
     {
       schema: {
-        tags: ['auth'],
+        tags: ['user'],
         description: 'Forgot password send',
         body: S.object().additionalProperties(false).prop('email', UserSchema.email.required()),
         response: {
@@ -220,7 +225,7 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
     '/forgot-password-change',
     {
       schema: {
-        tags: ['auth'],
+        tags: ['user'],
         description: 'Forgot password change',
         body: S.object()
           .additionalProperties(false)
@@ -262,6 +267,28 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
       await redisClient.del(`forgot-password:${email}`);
 
       res.status(HttpStatus.OK).send({ message: 'Password was changed' });
+    },
+  );
+
+  fastify.get(
+    '/account',
+    {
+      schema: {
+        tags: ['user'],
+        description: 'Get account',
+        security: [{ bearer: [] }],
+        response: {
+          [HttpStatus.OK]: GetUserAccountSchema(),
+          [HttpStatus.UNAUTHORIZED]: ExceptionSchemas.exception(UnauthorizedException),
+          [HttpStatus.NOT_FOUND]: ExceptionSchemas.exception(UserNotFoundException),
+        },
+      },
+      preHandler: [authPlugin],
+    },
+    async (req: AuthRequest, res) => {
+      const user = await userService.getUserAccount(req.user);
+
+      res.status(HttpStatus.OK).send({ user, success: true });
     },
   );
 }

@@ -11,10 +11,10 @@ components:
       bearerFormat: JWT
   schemas: {}
 paths:
-  /sign-up:
+  /user/sign-up:
     post:
       tags:
-        - auth
+        - user
       description: Sign up
       requestBody:
         content:
@@ -26,15 +26,11 @@ paths:
                 email:
                   type: string
                   format: email
-                  examples:
-                    - user@example.com
                 password:
                   type: string
                   minLength: 8
                   maxLength: 32
                   pattern: ^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()-_=+\\|{}\[\];:,.<>\/?`~]+$
-                  examples:
-                    - password123
               required:
                 - email
                 - password
@@ -53,8 +49,6 @@ paths:
                   email:
                     type: string
                     format: email
-                    examples:
-                      - user@example.com
                 required:
                   - id
                   - email
@@ -79,10 +73,10 @@ paths:
                 required:
                   - message
                   - success
-  /sign-in:
+  /user/sign-in:
     post:
       tags:
-        - auth
+        - user
       description: Sign in
       requestBody:
         content:
@@ -94,15 +88,11 @@ paths:
                 email:
                   type: string
                   format: email
-                  examples:
-                    - user@example.com
                 password:
                   type: string
                   minLength: 8
                   maxLength: 32
                   pattern: ^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()-_=+\\|{}\[\];:,.<>\/?`~]+$
-                  examples:
-                    - password123
               required:
                 - email
                 - password
@@ -165,10 +155,54 @@ paths:
                 required:
                   - message
                   - success
-  /forgot-password-send:
+  /user/google/auth:
+    get:
+      tags:
+        - user
+      description: Google auth
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: code
+          required: true
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                required:
+                  - token
+        "400":
+          description: |-
+            Available messages:
+
+            • USER_WAS_REGISTERED_WITH_ANOTHER_METHOD
+          content:
+            application/json:
+              schema:
+                type: object
+                description: |-
+                  Available messages:
+
+                  • USER_WAS_REGISTERED_WITH_ANOTHER_METHOD
+                properties:
+                  message:
+                    type: string
+                  success:
+                    type: boolean
+                required:
+                  - message
+                  - success
+  /user/forgot-password-send:
     post:
       tags:
-        - auth
+        - user
       description: Forgot password send
       requestBody:
         content:
@@ -180,8 +214,6 @@ paths:
                 email:
                   type: string
                   format: email
-                  examples:
-                    - user@example.com
               required:
                 - email
         required: true
@@ -218,10 +250,10 @@ paths:
                 required:
                   - message
                   - success
-  /forgot-password-change:
+  /user/forgot-password-change:
     post:
       tags:
-        - auth
+        - user
       description: Forgot password change
       requestBody:
         content:
@@ -233,8 +265,6 @@ paths:
                 email:
                   type: string
                   format: email
-                  examples:
-                    - user@example.com
                 token:
                   type: string
                 password:
@@ -242,8 +272,6 @@ paths:
                   minLength: 8
                   maxLength: 32
                   pattern: ^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()-_=+\\|{}\[\];:,.<>\/?`~]+$
-                  examples:
-                    - password123
               required:
                 - email
                 - token
@@ -303,17 +331,13 @@ paths:
                 required:
                   - message
                   - success
-  /google/auth:
+  /user/account:
     get:
       tags:
-        - auth
-      description: Google auth
-      parameters:
-        - schema:
-            type: string
-          in: query
-          name: code
-          required: true
+        - user
+      description: Get account
+      security:
+        - bearer: []
       responses:
         "200":
           description: Default Response
@@ -322,15 +346,38 @@ paths:
               schema:
                 type: object
                 properties:
-                  token:
-                    type: string
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      email:
+                        type: string
+                        format: email
+                      name:
+                        type: string
+                        minLength: 1
+                        maxLength: 255
+                      method:
+                        type: string
+                        enum:
+                          - email
+                          - google
+                    required:
+                      - id
+                      - email
+                      - name
+                      - method
+                  success:
+                    type: boolean
                 required:
-                  - token
-        "409":
+                  - success
+        "401":
           description: |-
             Available messages:
 
-            • USER_WITH_SUCH_LOGIN_ALREADY_EXISTS
+            • UNAUTHORIZED
           content:
             application/json:
               schema:
@@ -338,7 +385,7 @@ paths:
                 description: |-
                   Available messages:
 
-                  • USER_WITH_SUCH_LOGIN_ALREADY_EXISTS
+                  • UNAUTHORIZED
                 properties:
                   message:
                     type: string
@@ -347,12 +394,28 @@ paths:
                 required:
                   - message
                   - success
-  /google/test:
-    get:
-      responses:
-        "200":
-          description: Default Response
+        "404":
+          description: |-
+            Available messages:
+
+            • USER_NOT_FOUND
+          content:
+            application/json:
+              schema:
+                type: object
+                description: |-
+                  Available messages:
+
+                  • USER_NOT_FOUND
+                properties:
+                  message:
+                    type: string
+                  success:
+                    type: boolean
+                required:
+                  - message
+                  - success
 servers:
   - url: http://localhost:3000
 tags:
-  - name: auth
+  - name: user

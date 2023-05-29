@@ -29,7 +29,7 @@ export async function startServer(options: {
         version: 'v1',
       },
       servers: [{ url: `http://localhost:${options.port}` }],
-      tags: [{ name: 'auth' }],
+      tags: [{ name: 'user' }],
       components: {
         securitySchemes: {
           bearer: {
@@ -50,7 +50,7 @@ export async function startServer(options: {
 
   if (Env.STAGE === 'local') {
     const swagger = fastify.swagger({ yaml: true });
-    await writeFile(path.resolve(__dirname, '../../../openapi.yml'), swagger);
+    await writeFile(path.resolve(__dirname, '../openapi.yml'), swagger);
   }
 
   await fastify.listen({ host: options.host, port: options.port });
