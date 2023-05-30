@@ -24,3 +24,10 @@ export interface ForgotPasswordChangeDto {
 export interface GetUserAccountDto {
   email: string;
 }
+
+export interface UpdateUserDto {
+  email?: string;
+  password?: string;
+  name?: string;
+  phoneNumber?: string;
+}

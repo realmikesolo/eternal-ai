@@ -1,9 +1,9 @@
 import { HttpException } from './http.exception';
 import { HttpStatus } from '../shared/status';
 
-export class UserWithSuchLoginAlreadyExistsException extends HttpException {
+export class UserWithSuchEmailAlreadyExistsException extends HttpException {
   constructor() {
-    super(HttpStatus.CONFLICT, { message: 'USER_WITH_SUCH_LOGIN_ALREADY_EXISTS', success: false });
+    super(HttpStatus.CONFLICT, { message: 'USER_WITH_SUCH_EMAIL_ALREADY_EXISTS', success: false });
   }
 }
 

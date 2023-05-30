@@ -10,6 +10,22 @@ export const UserSchema = {
     .pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()-_=+\\|{}\[\];:,.<>\/?`~]+$/),
   name: S.string().minLength(1).maxLength(255),
   method: S.string().enum(['email', 'google']),
+  phoneNumber: S.string().minLength(1).maxLength(255),
+};
+
+const FullUserSchema = (): ObjectSchema => {
+  return S.object()
+    .prop(
+      'user',
+      S.object()
+        .additionalProperties(false)
+        .prop('id', UserSchema.id.required())
+        .prop('email', UserSchema.email.required())
+        .prop('name', UserSchema.name.required())
+        .prop('method', UserSchema.method.required())
+        .prop('phoneNumber', UserSchema.phoneNumber.required()),
+    )
+    .prop('success', S.boolean().required());
 };
 
 const EmailAndPasswordSchema = (): ObjectSchema => {
@@ -39,6 +55,7 @@ export const SignUpRequestSchema = (): ObjectSchema => {
 
 export const SignUpResponseSchema = (): ObjectSchema => {
   return S.object()
+    .additionalProperties(false)
     .prop('user', S.object().prop('id', UserSchema.id.required()).prop('email', UserSchema.email.required()))
     .prop('success', S.boolean().required());
 };
@@ -80,14 +97,18 @@ export const ForgotPasswordChangeResponseSchema = (): ObjectSchema => {
 };
 
 export const GetUserAccountResponseSchema = (): ObjectSchema => {
+  return FullUserSchema();
+};
+
+export const UpdateUserRequestSchema = (): ObjectSchema => {
   return S.object()
-    .prop(
-      'user',
-      S.object()
-        .prop('id', UserSchema.id.required())
-        .prop('email', UserSchema.email.required())
-        .prop('name', UserSchema.name.required())
-        .prop('method', UserSchema.method.required()),
-    )
-    .prop('success', S.boolean().required());
+    .additionalProperties(false)
+    .prop('email', UserSchema.email)
+    .prop('name', UserSchema.name)
+    .prop('phoneNumber', UserSchema.phoneNumber)
+    .prop('password', UserSchema.password);
+};
+
+export const UpdateUserResponseSchema = (): ObjectSchema => {
+  return FullUserSchema();
 };

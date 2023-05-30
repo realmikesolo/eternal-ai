@@ -1,6 +1,6 @@
 import { PgErrors } from '@hibanka/pg-utils';
 import { User } from '../entities/models/user.model';
-import { UserWithSuchLoginAlreadyExistsException } from '../exceptions/user.exception';
+import { UserWithSuchEmailAlreadyExistsException } from '../exceptions/user.exception';
 import { hashPassword } from '../helpers/user.helper';
 
 export class UserRepository {
@@ -23,7 +23,7 @@ export class UserRepository {
       await user.save();
     } catch (e) {
       if (e.code === PgErrors.UNIQUE_VIOLATION) {
-        throw new UserWithSuchLoginAlreadyExistsException();
+        throw new UserWithSuchEmailAlreadyExistsException();
       }
       throw e;
     }
@@ -38,6 +38,24 @@ export class UserRepository {
   }
 
   public async getUserByEmail(email: string): Promise<User | null> {
-    return User.findOne({ where: { email } });
+    return User.findOneBy({ email });
+  }
+
+  public async getUserById(id: string): Promise<User | null> {
+    return User.findOneBy({ id });
+  }
+
+  public async updateUser(
+    user: User,
+    data: { email?: string; name?: string; phoneNumber?: string; password?: string },
+  ): Promise<void> {
+    const { email, name, phoneNumber, password } = data;
+
+    user.email = email ?? user.email;
+    user.name = name ?? user.name;
+    user.phoneNumber = phoneNumber ?? user.phoneNumber;
+    user.password = password ? await hashPassword(password) : user.password;
+
+    await user.save();
   }
 }

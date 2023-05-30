@@ -3,7 +3,7 @@ import {
   PasswordIsIncorrectException,
   UserNotFoundException,
   UserWasRegisteredWithAnotherMethod,
-  UserWithSuchLoginAlreadyExistsException,
+  UserWithSuchEmailAlreadyExistsException,
 } from '../exceptions/user.exception';
 import { ExceptionSchemas } from '../schemas/exception.schema';
 import { HttpStatus } from '../shared/status';
@@ -20,6 +20,8 @@ import {
   ForgotPasswordSendResponseSchema,
   ForgotPasswordChangeRequestSchema,
   ForgotPasswordChangeResponseSchema,
+  UpdateUserRequestSchema,
+  UpdateUserResponseSchema,
 } from '../schemas/user.schema';
 import { AuthRequest, authPlugin } from '../plugins/auth.plugin';
 import { UserService } from '../services/user.service';
@@ -29,6 +31,7 @@ import {
   GoogleAuthDto,
   SignInDto,
   SignUpDto,
+  UpdateUserDto,
 } from '../entities/dtos/user.dto';
 
 const userService = new UserService();
@@ -43,7 +46,8 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
         body: SignUpRequestSchema(),
         response: {
           [HttpStatus.CREATED]: SignUpResponseSchema(),
-          [HttpStatus.CONFLICT]: ExceptionSchemas.exception(UserWithSuchLoginAlreadyExistsException),
+          [HttpStatus.BAD_REQUEST]: ExceptionSchemas.exception(BadRequestException),
+          [HttpStatus.CONFLICT]: ExceptionSchemas.exception(UserWithSuchEmailAlreadyExistsException),
         },
       },
     },
@@ -68,11 +72,12 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
         body: SignInRequestSchema(),
         response: {
           [HttpStatus.OK]: SignInResponseSchema(),
-          [HttpStatus.NOT_FOUND]: ExceptionSchemas.exception(UserNotFoundException),
           [HttpStatus.BAD_REQUEST]: ExceptionSchemas.exception(
             BadRequestException,
             PasswordIsIncorrectException,
+            UserWasRegisteredWithAnotherMethod,
           ),
+          [HttpStatus.NOT_FOUND]: ExceptionSchemas.exception(UserNotFoundException),
         },
       },
     },
@@ -122,6 +127,8 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
         body: ForgotPasswordSendRequestSchema(),
         response: {
           [HttpStatus.OK]: ForgotPasswordSendResponseSchema(),
+          [HttpStatus.BAD_REQUEST]: ExceptionSchemas.exception(BadRequestException),
+          [HttpStatus.FORBIDDEN]: ExceptionSchemas.exception(ForbiddenException),
           [HttpStatus.NOT_FOUND]: ExceptionSchemas.exception(UserNotFoundException),
         },
       },
@@ -147,6 +154,7 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
         body: ForgotPasswordChangeRequestSchema(),
         response: {
           [HttpStatus.OK]: ForgotPasswordChangeResponseSchema(),
+          [HttpStatus.BAD_REQUEST]: ExceptionSchemas.exception(BadRequestException),
           [HttpStatus.FORBIDDEN]: ExceptionSchemas.exception(ForbiddenException),
           [HttpStatus.NOT_FOUND]: ExceptionSchemas.exception(UserNotFoundException),
         },
@@ -181,6 +189,31 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
     },
     async (req: AuthRequest, res) => {
       const user = await userService.getUserAccount(req.user);
+
+      res.status(HttpStatus.OK).send({ user, success: true });
+    },
+  );
+
+  fastify.patch<{ Body: UpdateUserDto }>(
+    '/update-user',
+    {
+      schema: {
+        tags: ['user'],
+        description: 'Update user',
+        security: [{ bearer: [] }],
+        body: UpdateUserRequestSchema(),
+        response: {
+          [HttpStatus.OK]: UpdateUserResponseSchema(),
+          [HttpStatus.BAD_REQUEST]: ExceptionSchemas.exception(BadRequestException),
+          [HttpStatus.UNAUTHORIZED]: ExceptionSchemas.exception(UnauthorizedException),
+          [HttpStatus.FORBIDDEN]: ExceptionSchemas.exception(ForbiddenException),
+          [HttpStatus.NOT_FOUND]: ExceptionSchemas.exception(UserNotFoundException),
+        },
+      },
+      preHandler: [authPlugin],
+    },
+    async (req: AuthRequest & { body: UpdateUserDto }, res) => {
+      const user = await userService.updateUser({ id: req.user.id, method: req.user.method, ...req.body });
 
       res.status(HttpStatus.OK).send({ user, success: true });
     },

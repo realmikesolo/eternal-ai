@@ -16,6 +16,9 @@ export class User extends BaseEntity {
 
   @Column({ type: 'enum', enum: ['email', 'google'], default: 'email' })
   public method: RegisterMethod;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  public phoneNumber: string;
 }
 
 type RegisterMethod = 'email' | 'google';

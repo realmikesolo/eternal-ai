@@ -6,6 +6,7 @@ import {
   GoogleAuthDto,
   SignInDto,
   SignUpDto,
+  UpdateUserDto,
 } from '../entities/dtos/user.dto';
 import { User } from '../entities/models/user.model';
 import {
@@ -77,6 +78,10 @@ export class UserService {
       throw new UserNotFoundException();
     }
 
+    if (user.method !== 'email') {
+      throw new ForbiddenException();
+    }
+
     sgMail.setApiKey(Env.SENDGRID_API_KEY);
 
     const token = generateOtp();
@@ -121,6 +126,23 @@ export class UserService {
     if (!user) {
       throw new UserNotFoundException();
     }
+
+    return user;
+  }
+
+  public async updateUser(ctx: UpdateUserDto & { id: string; method: 'google' | 'email' }): Promise<User> {
+    const { id, method, email, name, phoneNumber, password } = ctx;
+
+    if (method === 'google') {
+      throw new ForbiddenException();
+    }
+
+    const user = await this.userRepository.getUserById(id);
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
+    await this.userRepository.updateUser(user, { email, name, phoneNumber, password });
 
     return user;
   }
