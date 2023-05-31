@@ -32,6 +32,7 @@ import {
   SignUpDto,
   UpdateUserDto,
 } from '../entities/dtos/user.dto';
+import { Env } from '../shared/env';
 
 const userService = new UserService();
 
@@ -112,7 +113,7 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
     ) => {
       const token = await userService.googleAuth(req.query);
 
-      res.redirect(`/?token=${token}}`);
+      res.redirect(`${Env.FRONTEND_URL}/?token=${token}}`);
     },
   );
 

@@ -18,8 +18,12 @@ export const Env = {
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET!,
 
   CLIENT_URL: process.env.CLIENT_URL!,
+  FRONTEND_URL: process.env.FRONTEND_URL!,
 
   REDIS_HOST: process.env.REDIS_HOST!,
   REDIS_PORT: Number(process.env.REDIS_PORT!),
   REDIS_PASSWORD: process.env.REDIS_PASSWORD!,
+
+  STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY!,
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY!,
 };

@@ -21,3 +21,4 @@ app_environment:
   GOOGLE_CLIENT_ID: "{{ GOOGLE_CLIENT_ID }}"
   GOOGLE_CLIENT_SECRET: "{{ GOOGLE_CLIENT_SECRET }}"
   CLIENT_URL: "{{ CLIENT_URL }}"
+  FRONTEND_URL: "http://localhost:5173"
