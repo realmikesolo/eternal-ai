@@ -14,7 +14,6 @@ import {
   SignUpRequestSchema,
   SignInRequestSchema,
   SignInResponseSchema,
-  GoogleAuthResponseSchema,
   GoogleAuthRequestSchema,
   ForgotPasswordSendRequestSchema,
   ForgotPasswordSendResponseSchema,
@@ -113,7 +112,7 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
     ) => {
       const token = await userService.googleAuth(req.query);
 
-      res.status(HttpStatus.OK).redirect(`/?token=${token}`);
+      res.redirect(`/?token=${token}}`);
     },
   );
 
