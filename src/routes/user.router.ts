@@ -113,7 +113,7 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
     ) => {
       const token = await userService.googleAuth(req.query);
 
-      res.redirect(`${Env.FRONTEND_URL}/?token=${token}}`);
+      res.redirect(`${Env.FRONTEND_URL}/login-successful/?token=${token}}`);
     },
   );
 
