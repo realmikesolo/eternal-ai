@@ -101,7 +101,6 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
         description: 'Google auth',
         querystring: GoogleAuthRequestSchema(),
         response: {
-          [HttpStatus.OK]: GoogleAuthResponseSchema(),
           [HttpStatus.BAD_REQUEST]: ExceptionSchemas.exception(UserWasRegisteredWithAnotherMethod),
         },
       },
@@ -114,7 +113,7 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
     ) => {
       const token = await userService.googleAuth(req.query);
 
-      res.status(HttpStatus.OK).send({ token, success: true });
+      res.status(HttpStatus.OK).redirect(`/?token=${token}`);
     },
   );
 

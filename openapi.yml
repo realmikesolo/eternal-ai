@@ -204,21 +204,6 @@ paths:
           name: code
           required: true
       responses:
-        "200":
-          description: Default Response
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: false
-                properties:
-                  token:
-                    type: string
-                  success:
-                    type: boolean
-                required:
-                  - token
-                  - success
         "400":
           description: |-
             Available messages:
