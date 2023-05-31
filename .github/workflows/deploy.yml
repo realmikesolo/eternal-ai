@@ -37,3 +37,4 @@ jobs:
             --extra-vars "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}"
             --extra-vars "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}"
             --extra-vars "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}"
+            --extra-vars "CLIENT_URL=${{ secrets.CLIENT_URL }}"
