@@ -14,7 +14,7 @@ export class PaymentService {
     if (!user) {
       throw new UserNotFoundException();
     }
-
+    console.log(100, user, 101, user.subscription);
     if (user.subscription) {
       throw new UserHasAlreadySubscribedException();
     }

@@ -18,6 +18,12 @@ export async function startServer(options: {
 
   await fastify.register(import('@fastify/cors'), {});
 
+  await fastify.register(import('fastify-raw-body'), {
+    field: 'rawBody',
+    global: false,
+    encoding: 'utf8',
+  });
+
   fastify.setErrorHandler(httpErrorHandler);
   fastify.setNotFoundHandler(httpNotFoundHandler);
 
