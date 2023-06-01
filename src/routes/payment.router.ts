@@ -19,7 +19,7 @@ export async function paymentRouter(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (req, res) => {
-      console.log(900, req.body, 901, typeof req.body);
+      console.log(900, req.rawBody, 901, typeof req.rawBody);
       const endpointSecret = 'we_1NECjwInsB9f0TAdRIIxRSH3';
 
       const sig = req.headers['stripe-signature']!;
@@ -27,7 +27,7 @@ export async function paymentRouter(fastify: FastifyInstance): Promise<void> {
       let event: Stripe.Event;
 
       try {
-        event = stripeClient.webhooks.constructEvent(req.body as string | Buffer, sig, endpointSecret);
+        event = stripeClient.webhooks.constructEvent(req.rawBody!, sig, endpointSecret);
       } catch (e) {
         console.log(e);
         throw e;
