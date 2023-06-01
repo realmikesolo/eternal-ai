@@ -6,10 +6,18 @@ import Stripe from 'stripe';
 const paymentService = new PaymentService();
 
 export async function paymentRouter(fastify: FastifyInstance): Promise<void> {
-  fastify.post('/subsrcibe', {}, async (req, res) => {
-    const subscription = await paymentService.subscribe(req.body);
-    res.status(200).send(subscription);
-  });
+  fastify.post(
+    '/subsrcibe',
+    {
+      config: {
+        rawBody: true,
+      },
+    },
+    async (req, res) => {
+      const subscription = await paymentService.subscribe(req.body);
+      res.status(200).send(subscription);
+    },
+  );
 
   fastify.post('/webhook', {}, async (req, res) => {
     const endpointSecret = 'we_1NECjwInsB9f0TAdRIIxRSH3';
