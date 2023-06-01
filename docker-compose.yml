@@ -33,6 +33,9 @@ services:
       REDIS_PASSWORD: '${REDIS_PASSWORD}'
       CLIENT_URL: '${CLIENT_URL}'
       FRONTEND_URL: '${FRONTEND_URL}'
+      STRIPE_PUBLISHABLE_KEY: '${STRIPE_PUBLISHABLE_KEY}'
+      STRIPE_SECRET_KEY: '${STRIPE_SECRET_KEY}'
+      STRIPE_PRICE_ID: '${STRIPE_PRICE_ID}'
     depends_on:
       - 'redis-eternal'
     networks:

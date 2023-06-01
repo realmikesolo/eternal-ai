@@ -39,3 +39,6 @@ jobs:
             --extra-vars "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}"
             --extra-vars "CLIENT_URL=${{ secrets.CLIENT_URL }}"
             --extra-vars "FRONTEND_URL=${{ secrets.FRONTEND_URL }}"
+            --extra-vars "STRIPE_PUBLISHABLE_KEY=${{ secrets.STRIPE_PUBLISHABLE_KEY }}"
+            --extra-vars "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}"
+            --extra-vars "STRIPE_PRICE_ID=${{ secrets.STRIPE_PRICE_ID }}"

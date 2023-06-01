@@ -4,6 +4,7 @@ import { startServer } from './server';
 import { Env } from './shared/env';
 import { connectDB } from './adapters/db';
 import { connectRedis } from './adapters/redis';
+import { paymentRouter } from './routes/payment.router';
 
 (async () => {
   await connectDB();
@@ -11,6 +12,6 @@ import { connectRedis } from './adapters/redis';
   await startServer({
     host: '0.0.0.0',
     port: Env.SERVER_PORT,
-    routes: [userRouter],
+    routes: [userRouter, paymentRouter],
   });
 })();

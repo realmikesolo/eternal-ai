@@ -24,3 +24,9 @@ export class UserWasRegisteredWithAnotherMethod extends HttpException {
     super(HttpStatus.BAD_REQUEST, { message: 'USER_WAS_REGISTERED_WITH_ANOTHER_METHOD', success: false });
   }
 }
+
+export class UserHasAlreadySubscribedException extends HttpException {
+  constructor() {
+    super(HttpStatus.BAD_REQUEST, { message: 'USER_HAS_ALREADY_SUBSCRIBED', success: false });
+  }
+}

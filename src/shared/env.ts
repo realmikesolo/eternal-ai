@@ -26,4 +26,5 @@ export const Env = {
 
   STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY!,
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY!,
+  STRIPE_PRICE_ID: process.env.STRIPE_PRICE_ID!,
 };

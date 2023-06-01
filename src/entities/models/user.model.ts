@@ -19,6 +19,12 @@ export class User extends BaseEntity {
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   public phoneNumber: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  public stripeId: string;
+
+  @Column({ type: 'varchar', length: 255, default: false })
+  public subscription: boolean;
 }
 
 type RegisterMethod = 'email' | 'google';
