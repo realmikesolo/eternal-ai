@@ -20,7 +20,7 @@ export async function paymentRouter(fastify: FastifyInstance): Promise<void> {
     },
     async (req, res) => {
       console.log(900, req.rawBody, 901, typeof req.rawBody);
-      const endpointSecret = 'we_1NECjwInsB9f0TAdRIIxRSH3';
+      const endpointSecret = 'whsec_BPmGeB4rUfRQl5F5pJqPgJjrCoBrFMxm';
 
       const sig = req.headers['stripe-signature']!;
 
