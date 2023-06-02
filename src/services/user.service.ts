@@ -133,16 +133,15 @@ export class UserService {
   public async updateUser(ctx: UpdateUserDto & { id: string; method: 'google' | 'email' }): Promise<User> {
     const { id, method, email, name, phoneNumber, password } = ctx;
 
-    if (method === 'google') {
-      throw new ForbiddenException();
-    }
-
     const user = await this.userRepository.getUserById(id);
     if (!user) {
       throw new UserNotFoundException();
     }
 
-    await this.userRepository.updateUser(user, { email, name, phoneNumber, password });
+    await this.userRepository.updateUser(
+      user,
+      method === 'google' ? { name, phoneNumber } : { email, name, phoneNumber, password },
+    );
 
     return user;
   }
