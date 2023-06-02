@@ -22,7 +22,7 @@ export interface ForgotPasswordChangeDto {
 }
 
 export interface GetUserAccountDto {
-  email: string;
+  id: string;
 }
 
 export interface UpdateUserDto {

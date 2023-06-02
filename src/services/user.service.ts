@@ -120,9 +120,9 @@ export class UserService {
   }
 
   public async getUserAccount(ctx: GetUserAccountDto): Promise<User> {
-    const { email } = ctx;
+    const { id } = ctx;
 
-    const user = await this.userRepository.getUserByEmail(email);
+    const user = await this.userRepository.getUserById(id);
     if (!user) {
       throw new UserNotFoundException();
     }
