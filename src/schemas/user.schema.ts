@@ -104,9 +104,9 @@ export const UpdateUserRequestSchema = (): ObjectSchema => {
   return S.object()
     .additionalProperties(false)
     .prop('email', UserSchema.email)
-    .prop('name', UserSchema.name)
-    .prop('phoneNumber', UserSchema.phoneNumber)
-    .prop('password', UserSchema.password);
+    .prop('name', S.string())
+    .prop('phoneNumber', S.string())
+    .prop('password', S.string());
 };
 
 export const UpdateUserResponseSchema = (): ObjectSchema => {

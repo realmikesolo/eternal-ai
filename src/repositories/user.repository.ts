@@ -47,14 +47,22 @@ export class UserRepository {
 
   public async updateUser(
     user: User,
-    data: { email?: string; name?: string; phoneNumber?: string; password?: string; subscription?: boolean },
+    data: {
+      email?: string;
+      name?: string;
+      phoneNumber?: string;
+      password?: string;
+      subscription?: boolean;
+      stripeId?: string;
+    },
   ): Promise<void> {
     const { email, name, phoneNumber, password } = data;
 
-    user.email = email ?? user.email;
-    user.name = name ?? user.name;
-    user.phoneNumber = phoneNumber ?? user.phoneNumber;
-    user.subscription = data.subscription ?? user.subscription;
+    user.email = email || user.email;
+    user.name = name || user.name;
+    user.phoneNumber = phoneNumber || user.phoneNumber;
+    user.subscription = data.subscription || user.subscription;
+    user.stripeId = data.stripeId || user.stripeId;
     user.password = password ? await hashPassword(password) : user.password;
 
     await user.save();
