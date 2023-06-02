@@ -65,6 +65,13 @@ export class UserRepository {
     user.stripeId = data.stripeId || user.stripeId;
     user.password = password ? await hashPassword(password) : user.password;
 
-    await user.save();
+    try {
+      await user.save();
+    } catch (e) {
+      if (e.code === PgErrors.UNIQUE_VIOLATION) {
+        throw new UserWithSuchEmailAlreadyExistsException();
+      }
+      throw e;
+    }
   }
 }
