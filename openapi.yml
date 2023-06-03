@@ -535,17 +535,10 @@ paths:
                   format: email
                 name:
                   type: string
-                  minLength: 1
-                  maxLength: 255
                 phoneNumber:
                   type: string
-                  minLength: 1
-                  maxLength: 255
                 password:
                   type: string
-                  minLength: 8
-                  maxLength: 32
-                  pattern: ^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()-_=+\\|{}\[\];:,.<>\/?`~]+$
       security:
         - bearer: []
       responses:
@@ -673,6 +666,119 @@ paths:
                 required:
                   - message
                   - success
+  /subsrcibe:
+    post:
+      tags:
+        - payment
+      description: Subscribe
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                cardNumber:
+                  type: string
+                  minLength: 14
+                  maxLength: 19
+                expMonth:
+                  type: number
+                  minimum: 1
+                  maximum: 12
+                expYear:
+                  type: number
+                  minimum: 2023
+                  maximum: 9999
+                cvc:
+                  type: string
+                  minLength: 3
+                  maxLength: 4
+              required:
+                - cardNumber
+                - expMonth
+                - expYear
+                - cvc
+        required: true
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                  status:
+                    type: string
+                  current_period_start:
+                    type: number
+                  current_period_end:
+                    type: number
+                  collection_method:
+                    type: string
+                  customer:
+                    type: string
+                required:
+                  - id
+                  - status
+                  - current_period_start
+                  - current_period_end
+                  - collection_method
+                  - customer
+        "400":
+          description: |-
+            Available messages:
+
+            • USER_HAS_ALREADY_SUBSCRIBED
+
+            • BAD_REQUEST
+          content:
+            application/json:
+              schema:
+                type: object
+                description: |-
+                  Available messages:
+
+                  • USER_HAS_ALREADY_SUBSCRIBED
+
+                  • BAD_REQUEST
+                properties:
+                  message:
+                    type: string
+                  success:
+                    type: boolean
+                required:
+                  - message
+                  - success
+        "404":
+          description: |-
+            Available messages:
+
+            • USER_NOT_FOUND
+          content:
+            application/json:
+              schema:
+                type: object
+                description: |-
+                  Available messages:
+
+                  • USER_NOT_FOUND
+                properties:
+                  message:
+                    type: string
+                  success:
+                    type: boolean
+                required:
+                  - message
+                  - success
+  /webhook:
+    post:
+      responses:
+        "200":
+          description: Default Response
 servers:
   - url: http://localhost:3000
 tags:

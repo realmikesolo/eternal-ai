@@ -9,22 +9,22 @@ export class User extends BaseEntity {
   public email: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  public password: string;
+  public password: string | null;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  public name: string;
+  public name: string | null;
 
   @Column({ type: 'enum', enum: ['email', 'google'], default: 'email' })
   public method: RegisterMethod;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  public phoneNumber: string;
+  public phoneNumber: string | null;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  public stripeId: string;
+  public stripeId: string | null;
 
-  @Column({ type: 'boolean', default: false })
-  public subscription: boolean;
+  @Column({ type: 'integer', nullable: true })
+  public subscriptionExpiresAt: number | null;
 }
 
 type RegisterMethod = 'email' | 'google';

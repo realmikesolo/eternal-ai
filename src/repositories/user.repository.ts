@@ -2,6 +2,7 @@ import { PgErrors } from '@hibanka/pg-utils';
 import { User } from '../entities/models/user.model';
 import { UserWithSuchEmailAlreadyExistsException } from '../exceptions/user.exception';
 import { hashPassword } from '../helpers/user.helper';
+import { LessThan } from 'typeorm';
 
 export class UserRepository {
   public async createUser(data: {
@@ -45,25 +46,15 @@ export class UserRepository {
     return User.findOneBy({ id });
   }
 
-  public async updateUser(
-    user: User,
-    data: {
-      email?: string;
-      name?: string;
-      phoneNumber?: string;
-      password?: string;
-      subscription?: boolean;
-      stripeId?: string;
-    },
-  ): Promise<void> {
-    const { email, name, phoneNumber, password } = data;
+  public async getUserByStripeId(stripeId: string): Promise<User | null> {
+    return User.findOneBy({ stripeId });
+  }
 
-    user.email = email || user.email;
-    user.name = name || user.name;
-    user.phoneNumber = phoneNumber || user.phoneNumber;
-    user.subscription = data.subscription || user.subscription;
-    user.stripeId = data.stripeId || user.stripeId;
-    user.password = password ? await hashPassword(password) : user.password;
+  public async updateUser(user: User, data: Partial<Omit<User, 'id'>>): Promise<void> {
+    await User.update(
+      { id: user.id },
+      { ...data, ...(data.password && { password: await hashPassword(data.password) }) },
+    );
 
     try {
       await user.save();
@@ -73,5 +64,9 @@ export class UserRepository {
       }
       throw e;
     }
+  }
+
+  public async getUsersWithExpiredSubscription(): Promise<User[]> {
+    return User.findBy({ subscriptionExpiresAt: LessThan(Date.now()) });
   }
 }

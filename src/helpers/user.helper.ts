@@ -32,3 +32,13 @@ export async function getGoogleUser(tokens: Credentials): Promise<{ email: strin
 export function generateOtp(): number {
   return Math.floor(Math.random() * 90_000) + 10_000;
 }
+
+export function filterBody<T extends Record<string, any>>(body: T): Partial<T> {
+  return Object.keys(body).reduce((acc, val) => {
+    if (body[val] !== '') {
+      acc[val] = body[val];
+    }
+
+    return acc;
+  }, {});
+}

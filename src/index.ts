@@ -5,6 +5,7 @@ import { Env } from './shared/env';
 import { connectDB } from './adapters/db';
 import { connectRedis } from './adapters/redis';
 import { paymentRouter } from './routes/payment.router';
+import { checkSubscriptionJob } from './workers/check-subscription.worker';
 
 (async () => {
   await connectDB();
@@ -14,4 +15,5 @@ import { paymentRouter } from './routes/payment.router';
     port: Env.SERVER_PORT,
     routes: [userRouter, paymentRouter],
   });
+  checkSubscriptionJob.start();
 })();
