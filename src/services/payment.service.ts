@@ -45,6 +45,7 @@ export class PaymentService {
 
     if (user.stripeId) {
       customer = await stripeClient.customers.retrieve(user.stripeId);
+      console.log(1, customer);
     } else {
       customer = await stripeClient.customers.create({
         email: user.email,
@@ -56,7 +57,7 @@ export class PaymentService {
 
       await this.userRepository.updateUser(user, { stripeId: customer.id });
     }
-
+    console.log(2, customer);
     const subscription = await stripeClient.subscriptions.create({
       customer: customer.id,
       items: [{ price: Env.STRIPE_PRICE_ID }],
@@ -86,10 +87,12 @@ export class PaymentService {
 
     switch (event.type) {
       case 'customer.subscription.created': {
+        console.log(33);
         if (customerSubscription.status === 'active') {
           await this.userRepository.updateUser(user, {
             subscriptionExpiresAt: customerSubscription.current_period_end,
           });
+          console.log(44, user);
         }
 
         break;
@@ -135,7 +138,7 @@ export class PaymentService {
     if (!user) {
       throw new UserNotFoundException();
     }
-
+    console.log(60, user);
     if (!user.subscriptionExpiresAt) {
       throw new UserHasNotSubscribedException();
     }
