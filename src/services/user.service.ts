@@ -45,7 +45,7 @@ export class UserService {
       throw new UserWasRegisteredWithAnotherMethod();
     }
 
-    if (!(await compare(password, user.password))) {
+    if (!(await compare(password, user.password!))) {
       throw new PasswordIsIncorrectException();
     }
 
