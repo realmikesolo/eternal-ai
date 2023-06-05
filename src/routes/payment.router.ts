@@ -1,10 +1,18 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
 import { PaymentService } from '../services/payment.service';
-import { SubscribeRequestSchema, SubscribeResponseSchema } from '../schemas/payment.schema';
+import {
+  SubscribeRequestSchema,
+  SubscribeResponseSchema,
+  UnsubscribeResponseSchema,
+} from '../schemas/payment.schema';
 import { HttpStatus } from '../shared/status';
 import { ExceptionSchemas } from '../schemas/exception.schema';
-import { UserHasAlreadySubscribedException, UserNotFoundException } from '../exceptions/user.exception';
-import { BadRequestException } from '../exceptions/http.exception';
+import {
+  UserHasAlreadySubscribedException,
+  UserHasNotSubscribedException,
+  UserNotFoundException,
+} from '../exceptions/user.exception';
+import { BadRequestException, UnauthorizedException } from '../exceptions/http.exception';
 import { SubscribeDto } from '../entities/dtos/payment.dto';
 import { AuthRequest, authPlugin } from '../plugins/auth.plugin';
 
@@ -24,6 +32,7 @@ export async function paymentRouter(fastify: FastifyInstance): Promise<void> {
             UserHasAlreadySubscribedException,
             BadRequestException,
           ),
+          [HttpStatus.UNAUTHORIZED]: ExceptionSchemas.exception(UnauthorizedException),
           [HttpStatus.NOT_FOUND]: ExceptionSchemas.exception(UserNotFoundException),
         },
       },
@@ -32,13 +41,31 @@ export async function paymentRouter(fastify: FastifyInstance): Promise<void> {
     async (req: AuthRequest & FastifyRequest<{ Body: SubscribeDto }>, res) => {
       const subscription = await paymentService.subscribe({ email: req.user.email, ...req.body });
 
-      res.status(200).send(subscription);
+      res.status(200).send({ subscription, success: true });
     },
   );
 
-  fastify.post('/unsubscribe', {}, async (req, res) => {
-    await paymentService.unsubscribe(req.body);
-  });
+  fastify.post(
+    '/unsubscribe',
+    {
+      schema: {
+        tags: ['payment'],
+        description: 'Unsubscribe',
+        response: {
+          [HttpStatus.OK]: UnsubscribeResponseSchema(),
+          [HttpStatus.BAD_REQUEST]: ExceptionSchemas.exception(UserHasNotSubscribedException),
+          [HttpStatus.UNAUTHORIZED]: ExceptionSchemas.exception(UnauthorizedException),
+          [HttpStatus.NOT_FOUND]: ExceptionSchemas.exception(UserNotFoundException),
+        },
+      },
+      preHandler: [authPlugin],
+    },
+    async (req: AuthRequest, res) => {
+      await paymentService.unsubscribe(req.user);
+
+      res.status(200).send({ message: 'Unsubscribed', success: true });
+    },
+  );
 
   fastify.post(
     '/webhook',

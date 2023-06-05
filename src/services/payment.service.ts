@@ -7,7 +7,7 @@ import {
 } from '../exceptions/user.exception';
 import { UserRepository } from '../repositories/user.repository';
 import { Env } from '../shared/env';
-import { SubscribeDto, SubscribeWebhookDto } from '../entities/dtos/payment.dto';
+import { SubscribeDto, SubscribeWebhookDto, UnsubscribeDto } from '../entities/dtos/payment.dto';
 
 export class PaymentService {
   private userRepository = new UserRepository();
@@ -45,7 +45,6 @@ export class PaymentService {
 
     if (user.stripeId) {
       customer = await stripeClient.customers.retrieve(user.stripeId);
-      console.log(1, customer);
     } else {
       customer = await stripeClient.customers.create({
         email: user.email,
@@ -57,7 +56,6 @@ export class PaymentService {
 
       await this.userRepository.updateUser(user, { stripeId: customer.id });
     }
-    console.log(2, user);
 
     const subscription = await stripeClient.subscriptions.create({
       customer: customer.id,
@@ -88,12 +86,10 @@ export class PaymentService {
 
     switch (event.type) {
       case 'customer.subscription.created': {
-        console.log(33);
         if (customerSubscription.status === 'active') {
           await this.userRepository.updateUser(user, {
             subscriptionExpiresAt: customerSubscription.current_period_end,
           });
-          console.log(44, user);
         }
 
         break;
@@ -125,6 +121,13 @@ export class PaymentService {
 
         break;
       }
+      case 'invoice.payment_succeeded': {
+        await this.userRepository.updateUser(user, {
+          subscriptionExpiresAt: customerSubscription.current_period_end,
+        });
+
+        break;
+      }
 
       default: {
         console.log(`Unhandled event type ${event.type}`);
@@ -132,10 +135,10 @@ export class PaymentService {
     }
   }
 
-  public async unsubscribe(ctx): Promise<void> {
-    const { email } = ctx;
+  public async unsubscribe(ctx: UnsubscribeDto): Promise<void> {
+    const { id } = ctx;
 
-    const user = await this.userRepository.getUserByEmail(email);
+    const user = await this.userRepository.getUserById(id);
     if (!user) {
       throw new UserNotFoundException();
     }
@@ -151,6 +154,8 @@ export class PaymentService {
       current_period_end: user.subscriptionExpiresAt,
     });
 
-    console.log(70, subscriptions);
+    await stripeClient.subscriptions.update(subscriptions.data[0].id, {
+      cancel_at_period_end: true,
+    });
   }
 }

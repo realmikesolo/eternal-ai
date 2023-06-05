@@ -19,10 +19,22 @@ export const SubscribeRequestSchema = (): ObjectSchema => {
 export const SubscribeResponseSchema = (): ObjectSchema => {
   return S.object()
     .additionalProperties(false)
-    .prop('id', S.string().required())
-    .prop('status', S.string().required())
-    .prop('current_period_start', S.number().required())
-    .prop('current_period_end', S.number().required())
-    .prop('collection_method', S.string().required())
-    .prop('customer', S.string().required());
+    .prop(
+      'subscription',
+      S.object()
+        .prop('id', S.string().required())
+        .prop('status', S.string().required())
+        .prop('current_period_start', S.number().required())
+        .prop('current_period_end', S.number().required())
+        .prop('collection_method', S.string().required())
+        .prop('customer', S.string().required()),
+    )
+    .prop('success', S.boolean().required());
+};
+
+export const UnsubscribeResponseSchema = (): ObjectSchema => {
+  return S.object()
+    .additionalProperties(false)
+    .prop('message', S.string().required())
+    .prop('success', S.boolean().required());
 };

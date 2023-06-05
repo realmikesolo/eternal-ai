@@ -9,3 +9,7 @@ export interface SubscribeWebhookDto {
   body: string | Buffer;
   signature: string | Buffer | string[];
 }
+
+export interface UnsubscribeDto {
+  id: string;
+}
