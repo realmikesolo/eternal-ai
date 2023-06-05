@@ -28,6 +28,7 @@ export async function paymentRouter(fastify: FastifyInstance): Promise<void> {
         tags: ['payment'],
         description: 'Subscribe',
         body: SubscribeRequestSchema(),
+        security: [{ bearer: [] }],
         response: {
           [HttpStatus.OK]: SubscribeResponseSchema(),
           [HttpStatus.BAD_REQUEST]: ExceptionSchemas.exception(
@@ -53,6 +54,7 @@ export async function paymentRouter(fastify: FastifyInstance): Promise<void> {
       schema: {
         tags: ['payment'],
         description: 'Unsubscribe',
+        security: [{ bearer: [] }],
         response: {
           [HttpStatus.OK]: UnsubscribeResponseSchema(),
           [HttpStatus.BAD_REQUEST]: ExceptionSchemas.exception(UserHasNotSubscribedException),
@@ -75,6 +77,7 @@ export async function paymentRouter(fastify: FastifyInstance): Promise<void> {
       schema: {
         tags: ['payment'],
         description: 'Change payment method',
+        security: [{ bearer: [] }],
         body: ChangePaymentMethodRequestSchema(),
         response: {
           [HttpStatus.OK]: ChangePaymentMethodResponseSchema(),

@@ -700,6 +700,8 @@ paths:
                 - expYear
                 - cvc
         required: true
+      security:
+        - bearer: []
       responses:
         "200":
           description: Default Response
@@ -807,6 +809,8 @@ paths:
       tags:
         - payment
       description: Unsubscribe
+      security:
+        - bearer: []
       responses:
         "200":
           description: Default Response
@@ -920,6 +924,8 @@ paths:
                 - expYear
                 - cvc
         required: true
+      security:
+        - bearer: []
       responses:
         "200":
           description: Default Response
