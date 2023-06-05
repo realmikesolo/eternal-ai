@@ -7,13 +7,17 @@ export const PaymentSchema = {
   cvc: S.string().minLength(3).maxLength(4),
 };
 
-export const SubscribeRequestSchema = (): ObjectSchema => {
+const CardSchema = (): ObjectSchema => {
   return S.object()
     .additionalProperties(false)
     .prop('cardNumber', PaymentSchema.cardNumber.required())
     .prop('expMonth', PaymentSchema.expMonth.required())
     .prop('expYear', PaymentSchema.expYear.required())
     .prop('cvc', PaymentSchema.cvc.required());
+};
+
+export const SubscribeRequestSchema = (): ObjectSchema => {
+  return CardSchema();
 };
 
 export const SubscribeResponseSchema = (): ObjectSchema => {
@@ -33,6 +37,17 @@ export const SubscribeResponseSchema = (): ObjectSchema => {
 };
 
 export const UnsubscribeResponseSchema = (): ObjectSchema => {
+  return S.object()
+    .additionalProperties(false)
+    .prop('message', S.string().required())
+    .prop('success', S.boolean().required());
+};
+
+export const ChangePaymentMethodRequestSchema = (): ObjectSchema => {
+  return CardSchema();
+};
+
+export const ChangePaymentMethodResponseSchema = (): ObjectSchema => {
   return S.object()
     .additionalProperties(false)
     .prop('message', S.string().required())

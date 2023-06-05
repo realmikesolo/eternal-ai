@@ -1,9 +1,11 @@
-export interface SubscribeDto {
+interface Card {
   cardNumber: string;
   expMonth: number;
   expYear: number;
   cvc: string;
 }
+
+export interface SubscribeDto extends Card {}
 
 export interface SubscribeWebhookDto {
   body: string | Buffer;
@@ -13,3 +15,5 @@ export interface SubscribeWebhookDto {
 export interface UnsubscribeDto {
   id: string;
 }
+
+export interface ChangePaymentMethodDto extends Card {}

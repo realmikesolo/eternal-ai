@@ -7,22 +7,27 @@ import {
 } from '../exceptions/user.exception';
 import { UserRepository } from '../repositories/user.repository';
 import { Env } from '../shared/env';
-import { SubscribeDto, SubscribeWebhookDto, UnsubscribeDto } from '../entities/dtos/payment.dto';
+import {
+  ChangePaymentMethodDto,
+  SubscribeDto,
+  SubscribeWebhookDto,
+  UnsubscribeDto,
+} from '../entities/dtos/payment.dto';
 
 export class PaymentService {
   private userRepository = new UserRepository();
 
   public async subscribe(
-    ctx: SubscribeDto & { email: string },
+    ctx: SubscribeDto & { id: string },
   ): Promise<
     Pick<
       Stripe.Subscription,
       'id' | 'status' | 'current_period_start' | 'current_period_end' | 'collection_method' | 'customer'
     >
   > {
-    const { email, cardNumber, expMonth, expYear, cvc } = ctx;
+    const { id, cardNumber, expMonth, expYear, cvc } = ctx;
 
-    const user = await this.userRepository.getUserByEmail(email);
+    const user = await this.userRepository.getUserById(id);
     if (!user) {
       throw new UserNotFoundException();
     }
@@ -156,6 +161,41 @@ export class PaymentService {
 
     await stripeClient.subscriptions.update(subscriptions.data[0].id, {
       cancel_at_period_end: true,
+    });
+  }
+
+  public async changePaymentMethod(ctx: ChangePaymentMethodDto & { id: string }): Promise<void> {
+    const { id, cardNumber, expMonth, expYear, cvc } = ctx;
+
+    const user = await this.userRepository.getUserById(id);
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
+    const paymentMethods = await stripeClient.customers.listPaymentMethods(user.stripeId!, { type: 'card' });
+
+    await stripeClient.paymentMethods.detach(paymentMethods.data[0].id);
+
+    const paymentMethod = await stripeClient.paymentMethods.create({
+      type: 'card',
+      card: {
+        number: cardNumber,
+        exp_month: expMonth,
+        exp_year: expYear,
+        cvc,
+      },
+    });
+
+    const customer = await stripeClient.customers.retrieve(user.stripeId!);
+
+    await stripeClient.paymentMethods.attach(paymentMethod.id, {
+      customer: customer.id,
+    });
+
+    await stripeClient.customers.update(customer.id, {
+      invoice_settings: {
+        default_payment_method: paymentMethod.id,
+      },
     });
   }
 }

@@ -1,6 +1,8 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
 import { PaymentService } from '../services/payment.service';
 import {
+  ChangePaymentMethodRequestSchema,
+  ChangePaymentMethodResponseSchema,
   SubscribeRequestSchema,
   SubscribeResponseSchema,
   UnsubscribeResponseSchema,
@@ -13,7 +15,7 @@ import {
   UserNotFoundException,
 } from '../exceptions/user.exception';
 import { BadRequestException, UnauthorizedException } from '../exceptions/http.exception';
-import { SubscribeDto } from '../entities/dtos/payment.dto';
+import { ChangePaymentMethodDto, SubscribeDto } from '../entities/dtos/payment.dto';
 import { AuthRequest, authPlugin } from '../plugins/auth.plugin';
 
 const paymentService = new PaymentService();
@@ -39,7 +41,7 @@ export async function paymentRouter(fastify: FastifyInstance): Promise<void> {
       preHandler: [authPlugin],
     },
     async (req: AuthRequest & FastifyRequest<{ Body: SubscribeDto }>, res) => {
-      const subscription = await paymentService.subscribe({ email: req.user.email, ...req.body });
+      const subscription = await paymentService.subscribe({ id: req.user.id, ...req.body });
 
       res.status(200).send({ subscription, success: true });
     },
@@ -64,6 +66,29 @@ export async function paymentRouter(fastify: FastifyInstance): Promise<void> {
       await paymentService.unsubscribe(req.user);
 
       res.status(200).send({ message: 'Unsubscribed', success: true });
+    },
+  );
+
+  fastify.post(
+    '/change-payment-method',
+    {
+      schema: {
+        tags: ['payment'],
+        description: 'Change payment method',
+        body: ChangePaymentMethodRequestSchema(),
+        response: {
+          [HttpStatus.OK]: ChangePaymentMethodResponseSchema(),
+          [HttpStatus.BAD_REQUEST]: ExceptionSchemas.exception(BadRequestException),
+          [HttpStatus.UNAUTHORIZED]: ExceptionSchemas.exception(UnauthorizedException),
+          [HttpStatus.NOT_FOUND]: ExceptionSchemas.exception(UserNotFoundException),
+        },
+      },
+      preHandler: [authPlugin],
+    },
+    async (req: AuthRequest & FastifyRequest<{ Body: ChangePaymentMethodDto }>, res) => {
+      await paymentService.changePaymentMethod({ id: req.user.id, ...req.body });
+
+      res.status(200).send({ message: 'Payment method changed', success: true });
     },
   );
 
