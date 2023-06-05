@@ -65,6 +65,6 @@ export class UserRepository {
   }
 
   public async getUsersWithExpiredSubscription(): Promise<User[]> {
-    return User.findBy({ subscriptionExpiresAt: LessThan(Date.now()) });
+    return User.findBy({ subscriptionExpiresAt: LessThan(Math.floor(Date.now() / 1000)) });
   }
 }

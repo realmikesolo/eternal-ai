@@ -139,13 +139,18 @@ export class PaymentService {
     if (!user) {
       throw new UserNotFoundException();
     }
-    console.log(60, user);
+
     if (!user.subscriptionExpiresAt) {
       throw new UserHasNotSubscribedException();
     }
 
     const customer = await stripeClient.customers.retrieve(user.stripeId!);
 
-    console.log(customer);
+    const subscriptions = await stripeClient.subscriptions.list({
+      customer: customer.id,
+      current_period_end: user.subscriptionExpiresAt,
+    });
+
+    console.log(70, subscriptions);
   }
 }
