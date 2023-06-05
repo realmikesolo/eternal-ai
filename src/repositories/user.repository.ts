@@ -51,10 +51,10 @@ export class UserRepository {
   }
 
   public async updateUser(user: User, data: Partial<Omit<User, 'id'>>): Promise<void> {
-    await User.update(
-      { id: user.id },
-      { ...data, ...(data.password && { password: await hashPassword(data.password) }) },
-    );
+    await User.update(user.id, {
+      ...data,
+      ...(data.password && { password: await hashPassword(data.password) }),
+    });
 
     try {
       await user.save();

@@ -57,7 +57,8 @@ export class PaymentService {
 
       await this.userRepository.updateUser(user, { stripeId: customer.id });
     }
-    console.log(2, customer);
+    console.log(2, user);
+
     const subscription = await stripeClient.subscriptions.create({
       customer: customer.id,
       items: [{ price: Env.STRIPE_PRICE_ID }],
