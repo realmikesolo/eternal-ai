@@ -774,6 +774,11 @@ paths:
                 required:
                   - message
                   - success
+  /unsubscribe:
+    post:
+      responses:
+        "200":
+          description: Default Response
   /webhook:
     post:
       responses:

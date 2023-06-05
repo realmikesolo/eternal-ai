@@ -30,3 +30,9 @@ export class UserHasAlreadySubscribedException extends HttpException {
     super(HttpStatus.BAD_REQUEST, { message: 'USER_HAS_ALREADY_SUBSCRIBED', success: false });
   }
 }
+
+export class UserHasNotSubscribedException extends HttpException {
+  constructor() {
+    super(HttpStatus.BAD_REQUEST, { message: 'USER_HAS_NOT_SUBSCRIBED', success: false });
+  }
+}

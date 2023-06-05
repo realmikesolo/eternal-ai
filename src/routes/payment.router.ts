@@ -36,6 +36,10 @@ export async function paymentRouter(fastify: FastifyInstance): Promise<void> {
     },
   );
 
+  fastify.post('/unsubscribe', {}, async (req, res) => {
+    await paymentService.unsubscribe(req.body);
+  });
+
   fastify.post(
     '/webhook',
     {

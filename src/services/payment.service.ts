@@ -1,6 +1,10 @@
 import Stripe from 'stripe';
 import { stripeClient } from '../configs/stripe.config';
-import { UserHasAlreadySubscribedException, UserNotFoundException } from '../exceptions/user.exception';
+import {
+  UserHasAlreadySubscribedException,
+  UserHasNotSubscribedException,
+  UserNotFoundException,
+} from '../exceptions/user.exception';
 import { UserRepository } from '../repositories/user.repository';
 import { Env } from '../shared/env';
 import { SubscribeDto, SubscribeWebhookDto } from '../entities/dtos/payment.dto';
@@ -122,5 +126,22 @@ export class PaymentService {
         console.log(`Unhandled event type ${event.type}`);
       }
     }
+  }
+
+  public async unsubscribe(ctx): Promise<void> {
+    const { email } = ctx;
+
+    const user = await this.userRepository.getUserByEmail(email);
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
+    if (!user.subscriptionExpiresAt) {
+      throw new UserHasNotSubscribedException();
+    }
+
+    const customer = await stripeClient.customers.retrieve(user.stripeId!);
+
+    console.log(customer);
   }
 }
