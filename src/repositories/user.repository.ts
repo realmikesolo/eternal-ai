@@ -51,13 +51,11 @@ export class UserRepository {
   }
 
   public async updateUser(user: User, data: Partial<Omit<User, 'id'>>): Promise<void> {
-    await User.update(user.id, {
-      ...data,
-      ...(data.password && { password: await hashPassword(data.password) }),
-    });
-
     try {
-      await user.save();
+      await User.update(user.id, {
+        ...data,
+        ...(data.password && { password: await hashPassword(data.password) }),
+      });
     } catch (e) {
       if (e.code === PgErrors.UNIQUE_VIOLATION) {
         throw new UserWithSuchEmailAlreadyExistsException();
