@@ -50,16 +50,16 @@ export class PaymentService {
 
     if (user.stripeId) {
       customer = await stripeClient.customers.retrieve(user.stripeId);
-    } else {
-      customer = await stripeClient.customers.create({
-        email: user.email,
-        payment_method: paymentMethod.id,
+
+      await stripeClient.customers.update(customer.id, {
         invoice_settings: {
           default_payment_method: paymentMethod.id,
         },
       });
-
-      await stripeClient.customers.update(customer.id, {
+    } else {
+      customer = await stripeClient.customers.create({
+        email: user.email,
+        payment_method: paymentMethod.id,
         invoice_settings: {
           default_payment_method: paymentMethod.id,
         },
