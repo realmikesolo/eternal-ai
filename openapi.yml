@@ -466,12 +466,21 @@ paths:
                         type: string
                         minLength: 1
                         maxLength: 255
+                      stripeId:
+                        type: string
+                        minLength: 1
+                        maxLength: 255
+                      subscriptionExpiresAt:
+                        type: number
+                        nullable: true
                     required:
                       - id
                       - email
                       - name
                       - method
                       - phoneNumber
+                      - stripeId
+                      - subscriptionExpiresAt
                   success:
                     type: boolean
                 required:
@@ -572,12 +581,21 @@ paths:
                         type: string
                         minLength: 1
                         maxLength: 255
+                      stripeId:
+                        type: string
+                        minLength: 1
+                        maxLength: 255
+                      subscriptionExpiresAt:
+                        type: number
+                        nullable: true
                     required:
                       - id
                       - email
                       - name
                       - method
                       - phoneNumber
+                      - stripeId
+                      - subscriptionExpiresAt
                   success:
                     type: boolean
                 required:

@@ -11,6 +11,8 @@ export const UserSchema = {
   name: S.string().minLength(1).maxLength(255),
   method: S.string().enum(['email', 'google']),
   phoneNumber: S.string().minLength(1).maxLength(255),
+  stripeId: S.string().minLength(1).maxLength(255),
+  subscriptionExpiresAt: S.number().raw({ nullable: true }),
 };
 
 const FullUserSchema = (): ObjectSchema => {
@@ -23,7 +25,9 @@ const FullUserSchema = (): ObjectSchema => {
         .prop('email', UserSchema.email.required())
         .prop('name', UserSchema.name.required())
         .prop('method', UserSchema.method.required())
-        .prop('phoneNumber', UserSchema.phoneNumber.required()),
+        .prop('phoneNumber', UserSchema.phoneNumber.required())
+        .prop('stripeId', UserSchema.stripeId.required())
+        .prop('subscriptionExpiresAt', UserSchema.subscriptionExpiresAt.required()),
     )
     .prop('success', S.boolean().required());
 };
