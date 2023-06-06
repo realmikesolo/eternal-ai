@@ -163,7 +163,7 @@ export class PaymentService {
       throw new UserHasNotSubscribedException();
     }
 
-    if (!isUserSubscribed(user)) {
+    if (!(await isUserSubscribed(user))) {
       throw new UserHasNotSubscribedException();
     }
 
