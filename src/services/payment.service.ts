@@ -59,6 +59,12 @@ export class PaymentService {
         },
       });
 
+      await stripeClient.customers.update(customer.id, {
+        invoice_settings: {
+          default_payment_method: paymentMethod.id,
+        },
+      });
+
       await this.userRepository.updateUser(user, { stripeId: customer.id });
     }
 
