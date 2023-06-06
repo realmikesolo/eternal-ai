@@ -684,7 +684,7 @@ paths:
                 required:
                   - message
                   - success
-  /subsrcibe:
+  /subscribe:
     post:
       tags:
         - payment
@@ -1032,3 +1032,4 @@ servers:
   - url: http://localhost:3000
 tags:
   - name: user
+  - name: payment

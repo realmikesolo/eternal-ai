@@ -22,7 +22,7 @@ const paymentService = new PaymentService();
 
 export async function paymentRouter(fastify: FastifyInstance): Promise<void> {
   fastify.post<{ Body: SubscribeDto }>(
-    '/subsrcibe',
+    '/subscribe',
     {
       schema: {
         tags: ['payment'],

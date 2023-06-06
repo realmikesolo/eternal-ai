@@ -35,7 +35,7 @@ export async function startServer(options: {
         version: 'v1',
       },
       servers: [{ url: `http://localhost:${options.port}` }],
-      tags: [{ name: 'user' }],
+      tags: [{ name: 'user' }, { name: 'payment' }],
       components: {
         securitySchemes: {
           bearer: {
