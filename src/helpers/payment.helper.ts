@@ -12,5 +12,6 @@ export async function isUserSubscribed(user: User): Promise<boolean> {
     current_period_end: subscriptionExpiresAt,
   });
 
+  console.log(1, subscriptions);
   return subscriptions.data[0].status === 'active';
 }
