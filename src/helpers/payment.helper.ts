@@ -11,6 +11,7 @@ export async function isUserSubscribed(user: User): Promise<boolean> {
     customer: stripeId,
     current_period_end: subscriptionExpiresAt,
   });
+
   const subscription = subscriptions.data[0];
 
   return subscription.cancel_at ? false : subscription.status === 'active';

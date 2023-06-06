@@ -13,6 +13,7 @@ import {
   SubscribeWebhookDto,
   UnsubscribeDto,
 } from '../entities/dtos/payment.dto';
+import { isUserSubscribed } from '../helpers/payment.helper';
 
 export class PaymentService {
   private userRepository = new UserRepository();
@@ -159,6 +160,10 @@ export class PaymentService {
     }
 
     if (!user.subscriptionExpiresAt) {
+      throw new UserHasNotSubscribedException();
+    }
+
+    if (!isUserSubscribed(user)) {
       throw new UserHasNotSubscribedException();
     }
 
