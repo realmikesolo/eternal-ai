@@ -13,6 +13,7 @@ export const UserSchema = {
   phoneNumber: S.string().minLength(1).maxLength(255),
   stripeId: S.string().minLength(1).maxLength(255),
   subscriptionExpiresAt: S.number().raw({ nullable: true }),
+  hasSubscription: S.boolean(),
 };
 
 const FullUserSchema = (): ObjectSchema => {
@@ -27,7 +28,8 @@ const FullUserSchema = (): ObjectSchema => {
         .prop('method', UserSchema.method.required())
         .prop('phoneNumber', UserSchema.phoneNumber.required())
         .prop('stripeId', UserSchema.stripeId.required())
-        .prop('subscriptionExpiresAt', UserSchema.subscriptionExpiresAt.required()),
+        .prop('subscriptionExpiresAt', UserSchema.subscriptionExpiresAt.required())
+        .prop('hasSubscription', UserSchema.hasSubscription.required()),
     )
     .prop('success', S.boolean().required());
 };

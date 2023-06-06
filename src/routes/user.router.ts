@@ -187,9 +187,9 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
       preHandler: [authPlugin],
     },
     async (req: AuthRequest, res) => {
-      const user = await userService.getUserAccount(req.user);
+      const { user, hasSubscription } = await userService.getUserAccount(req.user);
 
-      res.status(HttpStatus.OK).send({ user, success: true });
+      res.status(HttpStatus.OK).send({ user: { ...user, hasSubscription }, success: true });
     },
   );
 
@@ -212,9 +212,13 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
       preHandler: [authPlugin],
     },
     async (req: AuthRequest & { body: UpdateUserDto }, res) => {
-      const user = await userService.updateUser({ id: req.user.id, method: req.user.method, ...req.body });
+      const { user, hasSubscription } = await userService.updateUser({
+        id: req.user.id,
+        method: req.user.method,
+        ...req.body,
+      });
 
-      res.status(HttpStatus.OK).send({ user, success: true });
+      res.status(HttpStatus.OK).send({ user: { ...user, hasSubscription }, success: true });
     },
   );
 }

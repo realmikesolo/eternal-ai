@@ -21,6 +21,7 @@ import sgMail from '@sendgrid/mail';
 import { Env } from '../shared/env';
 import { redisClient } from '../adapters/redis';
 import { ForbiddenException } from '../exceptions/http.exception';
+import { isUserSubscribed } from '../helpers/payment.helper';
 
 export class UserService {
   private userRepository = new UserRepository();
@@ -119,7 +120,7 @@ export class UserService {
     return 'Password was changed';
   }
 
-  public async getUserAccount(ctx: GetUserAccountDto): Promise<User> {
+  public async getUserAccount(ctx: GetUserAccountDto): Promise<{ user: User; hasSubscription: boolean }> {
     const { id } = ctx;
 
     const user = await this.userRepository.getUserById(id);
@@ -127,10 +128,12 @@ export class UserService {
       throw new UserNotFoundException();
     }
 
-    return user;
+    return { user, hasSubscription: await isUserSubscribed(user) };
   }
 
-  public async updateUser(ctx: UpdateUserDto & { id: string; method: 'google' | 'email' }): Promise<User> {
+  public async updateUser(
+    ctx: UpdateUserDto & { id: string; method: 'google' | 'email' },
+  ): Promise<{ user: User; hasSubscription: boolean }> {
     const { id, method, email, name, phoneNumber, password } = ctx;
 
     const user = await this.userRepository.getUserById(id);
@@ -143,6 +146,6 @@ export class UserService {
       method === 'google' ? { name, phoneNumber } : { email, name, phoneNumber, password },
     );
 
-    return user;
+    return { user, hasSubscription: await isUserSubscribed(user) };
   }
 }
