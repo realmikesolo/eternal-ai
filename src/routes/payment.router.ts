@@ -48,7 +48,7 @@ export async function paymentRouter(fastify: FastifyInstance): Promise<void> {
     },
   );
 
-  fastify.post(
+  fastify.get(
     '/unsubscribe',
     {
       schema: {

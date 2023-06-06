@@ -823,7 +823,7 @@ paths:
                   - message
                   - success
   /unsubscribe:
-    post:
+    get:
       tags:
         - payment
       description: Unsubscribe
