@@ -211,7 +211,7 @@ export async function userRouter(fastify: FastifyInstance): Promise<void> {
       },
       preHandler: [authPlugin],
     },
-    async (req: AuthRequest & { body: UpdateUserDto }, res) => {
+    async (req: AuthRequest & FastifyRequest<{ Body: UpdateUserDto }>, res) => {
       const { user, hasSubscription } = await userService.updateUser({
         id: req.user.id,
         method: req.user.method,
