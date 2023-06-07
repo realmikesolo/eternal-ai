@@ -60,6 +60,7 @@ export class UserRepository {
       if (e.code === PgErrors.UNIQUE_VIOLATION) {
         throw new UserWithSuchEmailAlreadyExistsException();
       }
+
       throw e;
     }
   }

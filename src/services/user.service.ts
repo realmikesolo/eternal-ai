@@ -15,7 +15,7 @@ import {
   UserWasRegisteredWithAnotherMethod,
 } from '../exceptions/user.exception';
 import { UserRepository } from '../repositories/user.repository';
-import { generateOtp, generateToken, getGoogleUser } from '../helpers/user.helper';
+import { filterBody, generateOtp, generateToken, getGoogleUser } from '../helpers/user.helper';
 import { oauth2Client } from '../configs/google.config';
 import sgMail from '@sendgrid/mail';
 import { Env } from '../shared/env';
@@ -143,7 +143,9 @@ export class UserService {
 
     await this.userRepository.updateUser(
       user,
-      method === 'google' ? { name, phoneNumber } : { email, name, phoneNumber, password },
+      method === 'google'
+        ? filterBody({ name, phoneNumber })
+        : filterBody({ email, name, phoneNumber, password }),
     );
 
     return { user, hasSubscription: await isUserSubscribed(user) };

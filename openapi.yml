@@ -473,6 +473,8 @@ paths:
                       subscriptionExpiresAt:
                         type: number
                         nullable: true
+                      hasSubscription:
+                        type: boolean
                     required:
                       - id
                       - email
@@ -481,6 +483,7 @@ paths:
                       - phoneNumber
                       - stripeId
                       - subscriptionExpiresAt
+                      - hasSubscription
                   success:
                     type: boolean
                 required:
@@ -588,6 +591,8 @@ paths:
                       subscriptionExpiresAt:
                         type: number
                         nullable: true
+                      hasSubscription:
+                        type: boolean
                     required:
                       - id
                       - email
@@ -596,6 +601,7 @@ paths:
                       - phoneNumber
                       - stripeId
                       - subscriptionExpiresAt
+                      - hasSubscription
                   success:
                     type: boolean
                 required:
