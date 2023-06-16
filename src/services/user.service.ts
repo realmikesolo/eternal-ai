@@ -132,7 +132,7 @@ export class UserService {
   }
 
   public async updateUser(
-    ctx: UpdateUserDto & { id: string; method: 'google' | 'email' },
+    ctx: UpdateUserDto & Pick<User, 'id' | 'method'>,
   ): Promise<{ user: User; hasSubscription: boolean }> {
     const { id, method, email, name, phoneNumber, password } = ctx;
 
@@ -141,13 +141,13 @@ export class UserService {
       throw new UserNotFoundException();
     }
 
-    await this.userRepository.updateUser(
-      user,
+    const body: Partial<User> =
       method === 'google'
         ? filterBody({ name, phoneNumber })
-        : filterBody({ email, name, phoneNumber, password }),
-    );
+        : filterBody({ email, name, phoneNumber, password });
 
-    return { user, hasSubscription: await isUserSubscribed(user) };
+    await this.userRepository.updateUser(id, body);
+
+    return { user: { ...user, ...body } as User, hasSubscription: await isUserSubscribed(user) };
   }
 }

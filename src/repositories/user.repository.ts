@@ -50,9 +50,9 @@ export class UserRepository {
     return User.findOneBy({ stripeId });
   }
 
-  public async updateUser(user: User, data: Partial<Omit<User, 'id'>>): Promise<void> {
+  public async updateUser(id: string, data: Partial<Omit<User, 'id'>>): Promise<void> {
     try {
-      await User.update(user.id, {
+      await User.update(id, {
         ...data,
         ...(data.password && { password: await hashPassword(data.password) }),
       });

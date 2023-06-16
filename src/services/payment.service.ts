@@ -70,7 +70,7 @@ export class PaymentService {
         },
       });
 
-      await this.userRepository.updateUser(user, { stripeId: customer.id });
+      await this.userRepository.updateUser(user.id, { stripeId: customer.id });
     }
 
     const subscription = await stripeClient.subscriptions.create({
@@ -103,7 +103,7 @@ export class PaymentService {
     switch (event.type) {
       case 'customer.subscription.created': {
         if (customerSubscription.status === 'active') {
-          await this.userRepository.updateUser(user, {
+          await this.userRepository.updateUser(user.id, {
             subscriptionExpiresAt: customerSubscription.current_period_end,
           });
         }
@@ -114,7 +114,7 @@ export class PaymentService {
       case 'customer.subscription.deleted': {
         await stripeClient.paymentMethods.detach(customerSubscription.default_payment_method as string);
 
-        await this.userRepository.updateUser(user, {
+        await this.userRepository.updateUser(user.id, {
           subscriptionExpiresAt: customerSubscription.current_period_end,
         });
 
@@ -123,7 +123,7 @@ export class PaymentService {
 
       case 'customer.subscription.updated': {
         if (customerSubscription.status === 'active') {
-          await this.userRepository.updateUser(user, {
+          await this.userRepository.updateUser(user.id, {
             subscriptionExpiresAt: customerSubscription.current_period_end,
           });
         }
@@ -138,7 +138,7 @@ export class PaymentService {
         break;
       }
       case 'invoice.payment_succeeded': {
-        await this.userRepository.updateUser(user, {
+        await this.userRepository.updateUser(user.id, {
           subscriptionExpiresAt: customerSubscription.current_period_end,
         });
 

@@ -9,7 +9,7 @@ import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { Env } from './shared/env';
 
-export async function startServer(options: {
+export async function startHttpServer(options: {
   host: string;
   port: number;
   routes: Array<(fastify: FastifyInstance) => void>;

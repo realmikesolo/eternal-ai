@@ -1,19 +1,21 @@
 import 'dotenv/config';
 import { userRouter } from './routes/user.router';
-import { startServer } from './server';
+import { startHttpServer } from './http-server';
 import { Env } from './shared/env';
 import { connectDB } from './adapters/db';
 import { connectRedis } from './adapters/redis';
 import { paymentRouter } from './routes/payment.router';
 import { checkSubscriptionJob } from './workers/check-subscription.worker';
+import { startWsServer } from './ws-server';
 
 (async () => {
   await connectDB();
   await connectRedis();
-  await startServer({
+  await startHttpServer({
     host: '0.0.0.0',
     port: Env.SERVER_PORT,
     routes: [userRouter, paymentRouter],
   });
+  await startWsServer();
   checkSubscriptionJob.start();
 })();

@@ -9,6 +9,6 @@ export async function checkSubscriptionWorker(): Promise<void> {
   const users = await userRepository.getUsersWithExpiredSubscription();
 
   for (const user of users) {
-    await userRepository.updateUser(user, { subscriptionExpiresAt: null });
+    await userRepository.updateUser(user.id, { subscriptionExpiresAt: null });
   }
 }
