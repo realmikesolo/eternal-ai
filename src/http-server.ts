@@ -8,6 +8,8 @@ import { HttpStatus } from './shared/status';
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { Env } from './shared/env';
+import fastifyIO from 'fastify-socket.io';
+import { AuthSocket, authPluginSocket } from './plugins/auth.plugin';
 
 export async function startHttpServer(options: {
   host: string;
@@ -52,7 +54,31 @@ export async function startHttpServer(options: {
     fastify.register(route);
   }
 
+  await fastify.register(fastifyIO);
+
   await fastify.ready();
+
+  fastify.io.use(async (socket, next) => {
+    await authPluginSocket(socket);
+
+    next();
+  });
+
+  fastify.io.on('connection', (socket: AuthSocket) => {
+    if (!socket.user) {
+      socket.emit('unauthorized', 'Invalid token');
+
+      socket.disconnect(true);
+    }
+
+    socket.on('hero', (message) => {
+      console.log(`Act as ${message}`);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('ws disconnected');
+    });
+  });
 
   if (Env.STAGE === 'local') {
     const swagger = fastify.swagger({ yaml: true });

@@ -6,7 +6,6 @@ import { connectDB } from './adapters/db';
 import { connectRedis } from './adapters/redis';
 import { paymentRouter } from './routes/payment.router';
 import { checkSubscriptionJob } from './workers/check-subscription.worker';
-import { startWsServer } from './ws-server';
 
 (async () => {
   await connectDB();
@@ -16,6 +15,5 @@ import { startWsServer } from './ws-server';
     port: Env.SERVER_PORT,
     routes: [userRouter, paymentRouter],
   });
-  await startWsServer();
   checkSubscriptionJob.start();
 })();

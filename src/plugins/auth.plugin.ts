@@ -2,6 +2,8 @@ import { FastifyRequest } from 'fastify';
 import { UnauthorizedException } from '../exceptions/http.exception';
 import { JwtPayload, verify } from 'jsonwebtoken';
 import { Env } from '../shared/env';
+import { Socket } from 'socket.io';
+import { User } from '../entities/models/user.model';
 
 export async function authPlugin(req: FastifyRequest): Promise<void> {
   try {
@@ -21,6 +23,22 @@ export async function authPlugin(req: FastifyRequest): Promise<void> {
   }
 }
 
-export type AuthRequest = FastifyRequest & {
-  user: { id: string; email: string; method: 'email' | 'google' };
-};
+export async function authPluginSocket(socket: Socket): Promise<void> {
+  try {
+    const [type, token] = (socket.handshake.headers.authorization ?? '').split(' ');
+
+    if (type !== 'Bearer' || !token) {
+      return;
+    }
+
+    const user = verify(token, Env.JWT_SECRET) as JwtPayload;
+
+    socket['user'] = user;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export type AuthSocket = Socket & { user: Pick<User, 'id' | 'email' | 'method'> };
+
+export type AuthRequest = FastifyRequest & { user: Pick<User, 'id' | 'email' | 'method'> };
