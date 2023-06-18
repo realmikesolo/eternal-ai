@@ -3,8 +3,9 @@ import { Env } from '../shared/env';
 import { hash, genSalt } from 'bcrypt';
 import { Credentials } from 'google-auth-library';
 import axios from 'axios';
+import { User } from '../entities/models/user.model';
 
-export function generateToken(user: { id: string; email: string; method: 'email' | 'google' }): string {
+export function generateToken(user: Pick<User, 'id' | 'email' | 'method' | 'subscriptionExpiresAt'>): string {
   return sign(JSON.parse(JSON.stringify(user)), Env.JWT_SECRET, { expiresIn: '1d' });
 }
 

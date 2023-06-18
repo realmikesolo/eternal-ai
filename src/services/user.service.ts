@@ -50,7 +50,12 @@ export class UserService {
       throw new PasswordIsIncorrectException();
     }
 
-    return generateToken({ id: user.id, email: user.email, method: user.method });
+    return generateToken({
+      id: user.id,
+      email: user.email,
+      method: user.method,
+      subscriptionExpiresAt: user.subscriptionExpiresAt,
+    });
   }
 
   public async googleAuth(ctx: GoogleAuthDto): Promise<string> {
@@ -68,7 +73,12 @@ export class UserService {
       throw new UserWasRegisteredWithAnotherMethod();
     }
 
-    return generateToken({ id: user.id, email: user.email, method: user.method });
+    return generateToken({
+      id: user.id,
+      email: user.email,
+      method: user.method,
+      subscriptionExpiresAt: user.subscriptionExpiresAt,
+    });
   }
 
   public async forgotPasswordSend(ctx: ForgotPasswordSendDto): Promise<string> {
