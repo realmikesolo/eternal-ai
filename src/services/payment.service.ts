@@ -14,6 +14,7 @@ import {
   UnsubscribeDto,
 } from '../entities/dtos/payment.dto';
 import { isUserSubscribed } from '../helpers/payment.helper';
+import { User } from '../entities/models/user.model';
 
 export class PaymentService {
   private userRepository = new UserRepository();
@@ -179,7 +180,7 @@ export class PaymentService {
     });
   }
 
-  public async changePaymentMethod(ctx: ChangePaymentMethodDto & { id: string }): Promise<void> {
+  public async changePaymentMethod(ctx: ChangePaymentMethodDto & Pick<User, 'id'>): Promise<void> {
     const { id, cardNumber, expMonth, expYear, cvc } = ctx;
 
     const user = await this.userRepository.getUserById(id);
