@@ -39,6 +39,10 @@ export async function authPluginSocket(socket: Socket): Promise<void> {
   }
 }
 
-export type AuthSocket = Socket & { user: Pick<User, 'id' | 'email' | 'method'> };
+export type AuthSocket = Socket & {
+  user: Pick<User, 'id' | 'email' | 'method' | 'subscriptionExpiresAt'>;
+};
 
-export type AuthRequest = FastifyRequest & { user: Pick<User, 'id' | 'email' | 'method'> };
+export type AuthRequest = FastifyRequest & {
+  user: Pick<User, 'id' | 'email' | 'method' | 'subscriptionExpiresAt'>;
+};

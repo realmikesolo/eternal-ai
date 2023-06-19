@@ -25,6 +25,9 @@ export class User extends BaseEntity {
 
   @Column({ type: 'integer', nullable: true })
   public subscriptionExpiresAt: number | null;
+
+  @Column({ type: 'integer', default: 5 })
+  public freeQuestions: number;
 }
 
 type RegisterMethod = 'email' | 'google';

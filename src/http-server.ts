@@ -10,6 +10,7 @@ import path from 'node:path';
 import { Env } from './shared/env';
 import fastifyIO from 'fastify-socket.io';
 import { AuthSocket, authPluginSocket } from './plugins/auth.plugin';
+import { ChatService } from './services/chat.service';
 
 export async function startHttpServer(options: {
   host: string;
@@ -64,20 +65,10 @@ export async function startHttpServer(options: {
     next();
   });
 
-  fastify.io.on('connection', (socket: AuthSocket) => {
-    if (!socket.user) {
-      socket.emit('unauthorized', 'Invalid token');
+  fastify.io.on('connection', async (socket: AuthSocket) => {
+    const chatService = new ChatService();
 
-      socket.disconnect(true);
-    }
-
-    socket.on('hero', (message) => {
-      console.log(`Act as ${message}`);
-    });
-
-    socket.on('disconnect', () => {
-      console.log('ws disconnected');
-    });
+    await chatService.askQuestion(socket);
   });
 
   if (Env.STAGE === 'local') {
