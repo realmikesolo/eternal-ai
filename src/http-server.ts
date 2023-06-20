@@ -12,6 +12,8 @@ import fastifyIO from 'fastify-socket.io';
 import { AuthSocket, authPluginSocket } from './plugins/auth.plugin';
 import { ChatService } from './services/chat.service';
 
+const chatService = new ChatService();
+
 export async function startHttpServer(options: {
   host: string;
   port: number;
@@ -66,9 +68,7 @@ export async function startHttpServer(options: {
   });
 
   fastify.io.on('connection', async (socket: AuthSocket) => {
-    const chatService = new ChatService();
-
-    await chatService.askQuestion(socket);
+    await chatService.connect(socket);
   });
 
   if (Env.STAGE === 'local') {

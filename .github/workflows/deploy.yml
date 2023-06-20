@@ -43,3 +43,4 @@ jobs:
             --extra-vars "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}"
             --extra-vars "STRIPE_PRICE_ID=${{ secrets.STRIPE_PRICE_ID }}"
             --extra-vars "STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}"
+            --extra-vars "OPEN_AI_API_KEY=${{ secrets.OPEN_AI_API_KEY }}"

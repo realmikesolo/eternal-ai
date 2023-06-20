@@ -28,4 +28,6 @@ export const Env = {
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY!,
   STRIPE_PRICE_ID: process.env.STRIPE_PRICE_ID!,
   STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET!,
+
+  OPEN_AI_API_KEY: process.env.OPEN_AI_API_KEY!,
 };
