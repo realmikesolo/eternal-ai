@@ -15,13 +15,15 @@ import {
   UserWasRegisteredWithAnotherMethod,
 } from '../exceptions/user.exception';
 import { UserRepository } from '../repositories/user.repository';
-import { filterBody, generateOtp, generateToken, getGoogleUser } from '../helpers/user.helper';
 import { oauth2Client } from '../configs/google.config';
 import sgMail from '@sendgrid/mail';
 import { Env } from '../shared/env';
 import { redisClient } from '../adapters/redis';
 import { ForbiddenException } from '../exceptions/http.exception';
-import { isUserSubscribed } from '../helpers/payment.helper';
+import { sign } from 'jsonwebtoken';
+import { Credentials } from 'google-auth-library';
+import axios from 'axios';
+import { isUserSubscribed } from '../shared/utils';
 
 export class UserService {
   private userRepository = new UserRepository();
@@ -50,7 +52,7 @@ export class UserService {
       throw new PasswordIsIncorrectException();
     }
 
-    return generateToken({
+    return this.generateToken({
       id: user.id,
       email: user.email,
       method: user.method,
@@ -62,7 +64,7 @@ export class UserService {
     const { code } = ctx;
 
     const { tokens } = await oauth2Client.getToken(code);
-    const { email, name } = await getGoogleUser(tokens);
+    const { email, name } = await this.getGoogleUser(tokens);
 
     let user = await this.userRepository.getUserByEmail(email);
     if (!user) {
@@ -73,7 +75,7 @@ export class UserService {
       throw new UserWasRegisteredWithAnotherMethod();
     }
 
-    return generateToken({
+    return this.generateToken({
       id: user.id,
       email: user.email,
       method: user.method,
@@ -95,7 +97,7 @@ export class UserService {
 
     sgMail.setApiKey(Env.SENDGRID_API_KEY);
 
-    const token = generateOtp();
+    const token = this.generateOtp();
 
     await Promise.all([
       redisClient.set(`forgot-password:${email}`, token, 'EX', 60 * 60 * 24),
@@ -153,11 +155,46 @@ export class UserService {
 
     const body: Partial<User> =
       method === 'google'
-        ? filterBody({ name, phoneNumber })
-        : filterBody({ email, name, phoneNumber, password });
+        ? this.filterBody({ name, phoneNumber })
+        : this.filterBody({ email, name, phoneNumber, password });
 
     await this.userRepository.updateUser(id, body);
 
     return { user: { ...user, ...body } as User, hasSubscription: await isUserSubscribed(user) };
+  }
+
+  private generateToken(user: Pick<User, 'id' | 'email' | 'method' | 'subscriptionExpiresAt'>): string {
+    return sign(JSON.parse(JSON.stringify(user)), Env.JWT_SECRET, { expiresIn: '1d' });
+  }
+
+  private generateOtp(): number {
+    return Math.floor(Math.random() * 90_000) + 10_000;
+  }
+
+  private filterBody<T extends Record<string, any>>(body: T): Partial<T> {
+    return Object.keys(body).reduce((acc, val) => {
+      if (body[val] !== '') {
+        acc[val] = body[val];
+      }
+
+      return acc;
+    }, {});
+  }
+
+  private async getGoogleUser(tokens: Credentials): Promise<{ email: string; name: string }> {
+    const { access_token, id_token } = tokens;
+
+    const googleUser = await axios
+      .get(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`, {
+        headers: {
+          Authorization: `Bearer ${id_token}`,
+        },
+      })
+      .then((r) => r.data)
+      .catch((e) => {
+        throw new Error(e.message);
+      });
+
+    return { email: googleUser.email, name: googleUser.name };
   }
 }

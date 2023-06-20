@@ -102,7 +102,7 @@ export async function paymentRouter(fastify: FastifyInstance): Promise<void> {
         rawBody: true,
       },
     },
-    async (req, res) => {
+    async (req) => {
       await paymentService.paymentWebhook({
         body: req.rawBody!,
         signature: req.headers['stripe-signature']!,

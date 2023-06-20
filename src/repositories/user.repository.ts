@@ -1,8 +1,8 @@
 import { PgErrors } from '@hibanka/pg-utils';
 import { User } from '../entities/models/user.model';
 import { UserWithSuchEmailAlreadyExistsException } from '../exceptions/user.exception';
-import { hashPassword } from '../helpers/user.helper';
 import { LessThan } from 'typeorm';
+import { hash, genSalt } from 'bcrypt';
 
 export class UserRepository {
   public async createUser(data: {
@@ -16,7 +16,7 @@ export class UserRepository {
     const user = new User();
 
     user.email = email;
-    user.password = password ? await hashPassword(password) : '';
+    user.password = password ? await this.hashPassword(password) : '';
     user.method = method;
     user.name = name ?? '';
 
@@ -33,7 +33,7 @@ export class UserRepository {
   }
 
   public async changeUserPassword(user: User, password: string): Promise<void> {
-    user.password = await hashPassword(password);
+    user.password = await this.hashPassword(password);
 
     await user.save();
   }
@@ -54,7 +54,7 @@ export class UserRepository {
     try {
       await User.update(id, {
         ...data,
-        ...(data.password && { password: await hashPassword(data.password) }),
+        ...(data.password && { password: await this.hashPassword(data.password) }),
       });
     } catch (e) {
       if (e.code === PgErrors.UNIQUE_VIOLATION) {
@@ -67,5 +67,9 @@ export class UserRepository {
 
   public async getUsersWithExpiredSubscription(): Promise<User[]> {
     return User.findBy({ subscriptionExpiresAt: LessThan(Math.floor(Date.now() / 1000)) });
+  }
+
+  private async hashPassword(password: string): Promise<string> {
+    return hash(password, await genSalt(10));
   }
 }
