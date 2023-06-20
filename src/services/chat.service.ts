@@ -70,6 +70,10 @@ export class ChatService {
       .lrange(this.buildRedisMessageKey(user.id), 0, -1)
       .then((messages) => messages.map((message) => JSON.parse(message)));
 
+    if (!userMessages?.length) {
+      return this.sendSocketError(socket, 'error', 'HERO_WAS_NOT_SELECTED');
+    }
+
     const userQuestion = { role: ChatCompletionRequestMessageRoleEnum.User, content: message.question };
 
     const content = await openai
