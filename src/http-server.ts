@@ -24,7 +24,7 @@ export async function startHttpServer(options: {
   await fastify.register(import('@fastify/cors'), {
     origin: '*',
     methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: '*',
     maxAge: 1800,
   });
 
@@ -66,7 +66,7 @@ export async function startHttpServer(options: {
     cors: {
       origin: '*',
       methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      allowedHeaders: '*',
       maxAge: 1800,
     },
   });
