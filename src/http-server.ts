@@ -23,10 +23,11 @@ export async function startHttpServer(options: {
   const fastify = Fastify({ logger: true });
 
   await fastify.register(fastifyCors, {
-    origin: '*',
+    origin: 'http://localhost:5173',
     methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    // allowedHeaders: '*',
-    // maxAge: 1800,
+    allowedHeaders: '*',
+    credentials: true,
+    maxAge: 1800,
   });
 
   await fastify.register(import('fastify-raw-body'), {
@@ -67,8 +68,9 @@ export async function startHttpServer(options: {
     cors: {
       origin: 'http://localhost:5173',
       methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'],
-      // allowedHeaders: '*',
-      // maxAge: 1800,
+      credentials: true,
+      allowedHeaders: '*',
+      maxAge: 1800,
     },
   });
 
