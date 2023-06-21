@@ -23,7 +23,7 @@ export async function startHttpServer(options: {
   const fastify = Fastify({ logger: true });
 
   await fastify.register(fastifyCors, {
-    origin: '*',
+    origin: 'http://localhost:5173',
     methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: '*',
     maxAge: 1800,
@@ -66,7 +66,7 @@ export async function startHttpServer(options: {
   await fastify.register(fastifyIO, {
     allowEIO3: true,
     cors: {
-      origin: '*',
+      origin: 'http://localhost:5173',
       methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'],
       credentials: true,
       allowedHeaders: '*',
