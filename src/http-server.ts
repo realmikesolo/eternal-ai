@@ -22,12 +22,12 @@ export async function startHttpServer(options: {
 }): Promise<void> {
   const fastify = Fastify({ logger: true });
 
-  await fastify.register(fastifyCors, {
-    origin: '*',
-    methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: '*',
-    maxAge: 1800,
-  });
+  // await fastify.register(fastifyCors, {
+  //   origin: '*',
+  //   methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  //   allowedHeaders: '*',
+  //   maxAge: 1800,
+  // });
 
   await fastify.register(import('fastify-raw-body'), {
     field: 'rawBody',
@@ -63,16 +63,7 @@ export async function startHttpServer(options: {
     fastify.register(route);
   }
 
-  await fastify.register(fastifyIO, {
-    allowEIO3: true,
-    cors: {
-      origin: '*',
-      methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'],
-      allowedHeaders: '*',
-
-      maxAge: 1800,
-    },
-  });
+  await fastify.register(fastifyIO);
 
   await fastify.ready();
 
