@@ -11,6 +11,7 @@ import { Env } from './shared/env';
 import fastifyIO from 'fastify-socket.io';
 import { AuthSocket, authPluginSocket } from './plugins/auth.plugin';
 import { ChatService } from './services/chat.service';
+import fastifyCors from '@fastify/cors';
 
 const chatService = new ChatService();
 
@@ -21,11 +22,11 @@ export async function startHttpServer(options: {
 }): Promise<void> {
   const fastify = Fastify({ logger: true });
 
-  await fastify.register(import('@fastify/cors'), {
+  await fastify.register(fastifyCors, {
     origin: '*',
     methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: '*',
-    maxAge: 1800,
+    // allowedHeaders: '*',
+    // maxAge: 1800,
   });
 
   await fastify.register(import('fastify-raw-body'), {
@@ -64,10 +65,10 @@ export async function startHttpServer(options: {
 
   await fastify.register(fastifyIO, {
     cors: {
-      origin: '*',
+      origin: 'http://localhost:5173',
       methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'],
-      allowedHeaders: '*',
-      maxAge: 1800,
+      // allowedHeaders: '*',
+      // maxAge: 1800,
     },
   });
 
