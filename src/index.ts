@@ -6,7 +6,6 @@ import { connectDB } from './adapters/db';
 import { connectRedis } from './adapters/redis';
 import { paymentRouter } from './routes/payment.router';
 import { checkSubscriptionJob } from './workers/check-subscription.worker';
-import { chatRouter } from './routes/chat';
 
 (async () => {
   await connectDB();
@@ -14,7 +13,7 @@ import { chatRouter } from './routes/chat';
   await startHttpServer({
     host: '0.0.0.0',
     port: Env.SERVER_PORT,
-    routes: [userRouter, paymentRouter, chatRouter],
+    routes: [userRouter, paymentRouter],
   });
   checkSubscriptionJob.start();
 })();

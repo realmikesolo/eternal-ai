@@ -10,6 +10,10 @@ import path from 'node:path';
 import { Env } from './shared/env';
 import fastifyIO from 'fastify-socket.io';
 import fastifyCors from '@fastify/cors';
+import { authPluginSocket, AuthSocket } from './plugins/auth.plugin';
+import { ChatService } from './services/chat.service';
+
+const chatService = new ChatService();
 
 export async function startHttpServer(options: {
   host: string;
@@ -70,6 +74,16 @@ export async function startHttpServer(options: {
   }
 
   await fastify.ready();
+
+  fastify.io.use(async (socket, next) => {
+    await authPluginSocket(socket);
+
+    next();
+  });
+
+  fastify.io.on('connection', async (socket: AuthSocket) => {
+    await chatService.connect(socket);
+  });
 
   if (Env.STAGE === 'local') {
     const swagger = fastify.swagger({ yaml: true });
