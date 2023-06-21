@@ -9,11 +9,7 @@ import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { Env } from './shared/env';
 import fastifyIO from 'fastify-socket.io';
-import { AuthSocket, authPluginSocket } from './plugins/auth.plugin';
-import { ChatService } from './services/chat.service';
 import fastifyCors from '@fastify/cors';
-
-const chatService = new ChatService();
 
 export async function startHttpServer(options: {
   host: string;
@@ -27,6 +23,16 @@ export async function startHttpServer(options: {
     methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: '*',
     maxAge: 1800,
+  });
+
+  await fastify.register(fastifyIO, {
+    allowEIO3: true,
+    cors: {
+      origin: '*',
+      methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'],
+      allowedHeaders: '*',
+      maxAge: 1800,
+    },
   });
 
   await fastify.register(import('fastify-raw-body'), {
@@ -63,19 +69,7 @@ export async function startHttpServer(options: {
     fastify.register(route);
   }
 
-  await fastify.register(fastifyIO);
-
   await fastify.ready();
-
-  fastify.io.use(async (socket, next) => {
-    await authPluginSocket(socket);
-
-    next();
-  });
-
-  fastify.io.on('connection', async (socket: AuthSocket) => {
-    await chatService.connect(socket);
-  });
 
   if (Env.STAGE === 'local') {
     const swagger = fastify.swagger({ yaml: true });

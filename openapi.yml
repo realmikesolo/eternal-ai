@@ -1034,6 +1034,11 @@ paths:
       responses:
         "200":
           description: Default Response
+  /chat:
+    get:
+      responses:
+        "200":
+          description: Default Response
 servers:
   - url: http://localhost:3000
 tags:
