@@ -23,6 +23,7 @@ export async function startHttpServer(options: {
 
   await fastify.register(import('@fastify/cors'), {
     origin: ['http://localhost:5173'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
   });
 
   await fastify.register(import('fastify-raw-body'), {
@@ -62,6 +63,7 @@ export async function startHttpServer(options: {
   await fastify.register(fastifyIO, {
     cors: {
       origin: ['http://localhost:5173'],
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
     },
   });
 
