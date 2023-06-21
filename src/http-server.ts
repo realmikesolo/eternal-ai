@@ -21,9 +21,7 @@ export async function startHttpServer(options: {
 }): Promise<void> {
   const fastify = Fastify({ logger: true });
 
-  await fastify.register(import('@fastify/cors'), {
-    origin: ['http://localhost:5173'],
-  });
+  await fastify.register(import('@fastify/cors'), {});
 
   await fastify.register(import('fastify-raw-body'), {
     field: 'rawBody',
@@ -59,7 +57,11 @@ export async function startHttpServer(options: {
     fastify.register(route);
   }
 
-  await fastify.register(fastifyIO);
+  await fastify.register(fastifyIO, {
+    cors: {
+      origin: ['http://localhost:5173'],
+    },
+  });
 
   await fastify.ready();
 
