@@ -25,7 +25,7 @@ export async function authPlugin(req: FastifyRequest): Promise<void> {
 
 export async function authPluginSocket(socket: Socket): Promise<void> {
   try {
-    const [type, token] = (socket.handshake.auth ?? '').split(' ');
+    const [type, token] = (socket.handshake.auth.token ?? '').split(' ');
 
     if (type !== 'Bearer' || !token) {
       return;
