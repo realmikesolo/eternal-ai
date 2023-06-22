@@ -43,6 +43,7 @@ export class ChatService {
     socket: AuthSocket,
     message: { hero?: string; question: string },
   ): Promise<void> {
+    console.log(1, message);
     if (!user.subscriptionExpiresAt) {
       const freeQuestions = await redisClient.decr(this.buildRedisQuestionCountKey(user.id));
       if (freeQuestions < 0) {
@@ -92,6 +93,7 @@ export class ChatService {
       }),
     );
 
+    console.log(2, content);
     socket.emit('hero', content);
   }
 
