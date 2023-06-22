@@ -56,7 +56,7 @@ export async function startHttpServer(options: {
         version: 'v1',
       },
       servers: [{ url: `http://localhost:${options.port}` }],
-      tags: [{ name: 'user' }, { name: 'payment' }],
+      tags: [{ name: 'user' }, { name: 'payment' }, { name: 'chat' }],
       components: {
         securitySchemes: {
           bearer: {

@@ -38,12 +38,22 @@ export class ChatService {
     socket.on('hero', (message) => this.answerQuestion(user, socket, message));
   }
 
+  public async getChatHistory(
+    userId: string,
+  ): Promise<{ role: ChatCompletionRequestMessageRoleEnum; content: string }> {
+    return redisClient
+      .lrange(this.buildRedisMessageKey(userId), 0, -1)
+      .then((messages) => messages.map((message) => JSON.parse(message))) as Promise<{
+      role: ChatCompletionRequestMessageRoleEnum;
+      content: string;
+    }>;
+  }
+
   private async answerQuestion(
     user: User,
     socket: AuthSocket,
     message: { hero?: string; question: string },
   ): Promise<void> {
-    console.log(1, message);
     if (!user.subscriptionExpiresAt) {
       const freeQuestions = await redisClient.decr(this.buildRedisQuestionCountKey(user.id));
       if (freeQuestions < 0) {
@@ -93,8 +103,7 @@ export class ChatService {
       }),
     );
 
-    console.log(2, content);
-    socket.emit('hero', content);
+    socket.emit('heroResponse', content);
   }
 
   private sendSocketError(socket: AuthSocket, event: string, error: string): void {

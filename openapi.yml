@@ -1034,13 +1034,33 @@ paths:
       responses:
         "200":
           description: Default Response
-  /chat:
+  /chat-history:
     get:
+      tags:
+        - chat
+      description: Get chat history
       responses:
         "200":
           description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        role:
+                          type: string
+                        content:
+                          type: string
+                  success:
+                    type: boolean
 servers:
   - url: http://localhost:3000
 tags:
   - name: user
   - name: payment
+  - name: chat
