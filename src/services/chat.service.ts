@@ -22,7 +22,7 @@ export class ChatService {
       const freeQuestions = await redisClient.get(this.buildRedisQuestionCountKey(user.id));
       if (!freeQuestions) {
         if (user.freeQuestions <= 0) {
-          return this.sendSocketError(socket, 'error', 'NO_QUESTIONS_LEFT');
+          return this.sendSocketError(socket, 'user-questions', 'NO_QUESTIONS_LEFT');
         }
 
         await redisClient.set(this.buildRedisQuestionCountKey(user.id), user.freeQuestions);
@@ -31,7 +31,7 @@ export class ChatService {
       if (freeQuestions !== null && Number(freeQuestions) <= 0) {
         await this.userRepository.updateUser(user.id, { freeQuestions: 0 });
 
-        return this.sendSocketError(socket, 'error', 'NO_QUESTIONS_LEFT');
+        return this.sendSocketError(socket, 'user-questions', 'NO_QUESTIONS_LEFT');
       }
     }
 
@@ -59,7 +59,7 @@ export class ChatService {
       if (freeQuestions < 0) {
         await this.userRepository.updateUser(user.id, { freeQuestions: 0 });
 
-        return this.sendSocketError(socket, 'error', 'NO_QUESTIONS_LEFT');
+        return this.sendSocketError(socket, 'user-questions', 'NO_QUESTIONS_LEFT');
       }
     }
 
