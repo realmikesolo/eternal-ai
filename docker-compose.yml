@@ -44,7 +44,7 @@ services:
       - 'infrastructure-traefik'
       - 'eternal-ai'
     labels:
-      - 'traefik.enable=false'
+      - 'traefik.enable=true'
       - 'traefik.http.routers.eternal-ai.rule=Host(`api.ethernalai.site`)'
       - 'traefik.http.routers.eternal-ai.entrypoints=websecure'
       - 'traefik.http.routers.eternal-ai.tls=true'
