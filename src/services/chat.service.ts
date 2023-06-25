@@ -10,7 +10,8 @@ export class ChatService {
 
   public async connect(socket: AuthSocket): Promise<void> {
     if (!socket.user) {
-      return this.sendSocketError(socket, 'error', 'UNAUTHORIZED');
+      socket.emit('error', 'UNAUTHORIZED');
+      return;
     }
 
     const user = await this.userRepository.getUserById(socket.user.id);
