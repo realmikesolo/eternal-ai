@@ -51,7 +51,6 @@ export class UserRepository {
   }
 
   public async updateUser(id: string, data: Partial<Omit<User, 'id'>>): Promise<void> {
-    console.log(5, data);
     try {
       await User.update(id, {
         ...data,

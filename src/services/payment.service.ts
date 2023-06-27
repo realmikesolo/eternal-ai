@@ -139,20 +139,12 @@ export class PaymentService {
         break;
       }
       case 'invoice.payment_succeeded': {
-        console.log(
-          1,
-          customerSubscription['lines']['data'][0]['period']['end'],
-          2,
-          customerSubscription,
-          3,
-          user,
-        );
         if (!user.subscriptionExpiresAt) {
           await this.userRepository.updateUser(user.id, {
             subscriptionExpiresAt: customerSubscription['lines']['data'][0]['period']['end'],
           });
         }
-        console.log(4);
+
         break;
       }
 
