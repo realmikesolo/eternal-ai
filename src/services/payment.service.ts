@@ -80,6 +80,7 @@ export class PaymentService {
       collection_method: 'charge_automatically',
     });
 
+    console.log(0, user);
     return {
       id: subscription.id,
       status: subscription.status,
@@ -139,6 +140,7 @@ export class PaymentService {
         break;
       }
       case 'invoice.payment_succeeded': {
+        console.log(1, user, 2, customerSubscription, 3, customerSubscription.current_period_end);
         await this.userRepository.updateUser(user.id, {
           subscriptionExpiresAt: customerSubscription.current_period_end,
         });
