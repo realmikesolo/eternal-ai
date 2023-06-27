@@ -20,10 +20,15 @@ export class ChatService {
 
         const userQuestion = { role: ChatCompletionRequestMessageRoleEnum.User, content: message.question };
 
+        const systemPrompt = {
+          role: ChatCompletionRequestMessageRoleEnum.System,
+          content: this.generateSystemPrompt(message.hero),
+        };
+
         const content = await openai
           .createChatCompletion({
             model: 'gpt-3.5-turbo',
-            messages: [userQuestion],
+            messages: [systemPrompt, userQuestion],
           })
           .then((response) => response.data.choices[0].message!.content);
 
