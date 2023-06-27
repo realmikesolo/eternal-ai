@@ -4,6 +4,7 @@ import { openai } from '../configs/open-ai.config';
 import { AuthSocket } from '../plugins/auth.plugin';
 import { UserRepository } from '../repositories/user.repository';
 import { User } from '../entities/models/user.model';
+import { FREE_QUESTIONS } from '../shared/constants';
 
 export class ChatService {
   private userRepository = new UserRepository();
@@ -11,6 +12,24 @@ export class ChatService {
   public async connect(socket: AuthSocket): Promise<void> {
     if (!socket.user) {
       socket.emit('error', 'UNAUTHORIZED');
+
+      socket.on('hero', async (message) => {
+        if (!FREE_QUESTIONS.includes(message.question)) {
+          return socket.emit('error', 'UNAUTHORIZED');
+        }
+
+        const userQuestion = { role: ChatCompletionRequestMessageRoleEnum.User, content: message.question };
+
+        const content = await openai
+          .createChatCompletion({
+            model: 'gpt-3.5-turbo',
+            messages: [userQuestion],
+          })
+          .then((response) => response.data.choices[0].message!.content);
+
+        socket.emit('heroResponse', content);
+      });
+
       return;
     }
 
