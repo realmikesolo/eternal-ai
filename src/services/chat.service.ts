@@ -4,7 +4,7 @@ import { openai } from '../configs/open-ai.config';
 import { AuthSocket } from '../plugins/auth.plugin';
 import { UserRepository } from '../repositories/user.repository';
 import { User } from '../entities/models/user.model';
-import { FREE_QUESTIONS } from '../shared/constants';
+import { Constants } from '../shared/constants';
 
 export class ChatService {
   private userRepository = new UserRepository();
@@ -14,7 +14,7 @@ export class ChatService {
       socket.emit('error', 'UNAUTHORIZED');
 
       socket.on('hero', async (message) => {
-        if (!FREE_QUESTIONS.includes(message.question)) {
+        if (!Constants.FREE_QUESTIONS.includes(message.question)) {
           return socket.emit('error', 'UNAUTHORIZED');
         }
 
@@ -60,24 +60,29 @@ export class ChatService {
       }
     }
 
+    socket.on('chat-history', (message) =>
+      this.getChatHistory(user.id, message.hero).then((data) => socket.emit('chat-history', data.slice(2))),
+    );
     socket.on('hero', (message) => this.answerQuestion(user, socket, message));
   }
 
-  public async getChatHistory(
+  private async getChatHistory(
     userId: string,
-  ): Promise<{ role: ChatCompletionRequestMessageRoleEnum; content: string }> {
+    hero: string,
+  ): Promise<Array<{ role: ChatCompletionRequestMessageRoleEnum; content: string }>> {
     return redisClient
-      .lrange(this.buildRedisMessageKey(userId), 0, -1)
-      .then((messages) => messages.map((message) => JSON.parse(message))) as Promise<{
-      role: ChatCompletionRequestMessageRoleEnum;
-      content: string;
-    }>;
+      .lrange(this.buildRedisMessageKey(userId, hero), 0, -1)
+      .then((messages) =>
+        messages.map(
+          (message) => JSON.parse(message) as { role: ChatCompletionRequestMessageRoleEnum; content: string },
+        ),
+      );
   }
 
   private async answerQuestion(
     user: User,
     socket: AuthSocket,
-    message: { hero?: string; question: string },
+    message: { hero: string; question: string },
   ): Promise<void> {
     if (!user.subscriptionExpiresAt) {
       const freeQuestions = await redisClient.decr(this.buildRedisQuestionCountKey(user.id));
@@ -88,45 +93,39 @@ export class ChatService {
       }
     }
 
-    if (message.hero) {
-      await redisClient.del(this.buildRedisMessageKey(user.id));
-
-      await redisClient.rpush(
-        this.buildRedisMessageKey(user.id),
-        JSON.stringify({
-          role: ChatCompletionRequestMessageRoleEnum.System,
-          content: this.generateSystemPrompt(message.hero),
-        }),
-      );
-
-      await redisClient.expire(this.buildRedisMessageKey(user.id), 4 * 3600);
-    }
-
-    const userMessages = await redisClient
-      .lrange(this.buildRedisMessageKey(user.id), 0, -1)
-      .then((messages) => messages.map((message) => JSON.parse(message)));
-
-    if (!userMessages?.length) {
-      return this.sendSocketError(socket, 'error', 'HERO_WAS_NOT_SELECTED');
-    }
+    const chatHistory = await this.getChatHistory(user.id, message.hero);
 
     const userQuestion = { role: ChatCompletionRequestMessageRoleEnum.User, content: message.question };
 
     const content = await openai
       .createChatCompletion({
         model: 'gpt-3.5-turbo',
-        messages: [...userMessages, userQuestion],
+        messages: [...chatHistory, userQuestion],
       })
       .then((response) => response.data.choices[0].message!.content);
 
+    const isFirstMessage = !chatHistory?.length;
+
     await redisClient.rpush(
-      this.buildRedisMessageKey(user.id),
+      this.buildRedisMessageKey(user.id, message.hero),
+      ...(isFirstMessage
+        ? [
+            JSON.stringify({
+              role: ChatCompletionRequestMessageRoleEnum.System,
+              content: this.generateSystemPrompt(message.hero),
+            }),
+          ]
+        : []),
       JSON.stringify(userQuestion),
       JSON.stringify({
         role: ChatCompletionRequestMessageRoleEnum.Assistant,
         content,
       }),
     );
+
+    if (isFirstMessage) {
+      await redisClient.expire(this.buildRedisMessageKey(user.id, message.hero), Constants.CHAT_HISTORY_TTL);
+    }
 
     socket.emit('heroResponse', content);
   }
@@ -141,11 +140,15 @@ export class ChatService {
     return `You are ${name}. Engage as ${name} and respond to questions in character, providing insightful and forward-thinking answers as the real ${name} would.`;
   }
 
-  private buildRedisMessageKey(userId: string): string {
-    return `${userId}-messages`;
+  private buildRedisMessageKey(userId: string, hero: string): string {
+    return `${userId}-${this.transformHeroName(hero)}-messages`;
   }
 
   private buildRedisQuestionCountKey(userId: string): string {
     return `${userId}-questions-count`;
+  }
+
+  private transformHeroName(name: string): string {
+    return name.replaceAll(' ', '');
   }
 }
