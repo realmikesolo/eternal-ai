@@ -61,7 +61,7 @@ export class ChatService {
     }
 
     socket.on('chat-history', (message) =>
-      this.getChatHistory(user.id, message.hero).then((data) => socket.emit('chat-history', data.slice(2))),
+      this.getChatHistory(user.id, message.hero).then((data) => socket.emit('chat-history', data.slice(3))),
     );
     socket.on('hero', (message) => this.answerQuestion(user, socket, message));
   }
@@ -94,28 +94,24 @@ export class ChatService {
     }
 
     const chatHistory = await this.getChatHistory(user.id, message.hero);
+    const isFirstMessage = !chatHistory?.length;
 
     const userQuestion = { role: ChatCompletionRequestMessageRoleEnum.User, content: message.question };
+    const prompt = {
+      role: ChatCompletionRequestMessageRoleEnum.System,
+      content: this.generateSystemPrompt(message.hero),
+    };
 
     const content = await openai
       .createChatCompletion({
         model: 'gpt-3.5-turbo',
-        messages: [...chatHistory, userQuestion],
+        messages: [...(isFirstMessage ? [prompt] : chatHistory), userQuestion],
       })
       .then((response) => response.data.choices[0].message!.content);
 
-    const isFirstMessage = !chatHistory?.length;
-
     await redisClient.rpush(
       this.buildRedisMessageKey(user.id, message.hero),
-      ...(isFirstMessage
-        ? [
-            JSON.stringify({
-              role: ChatCompletionRequestMessageRoleEnum.System,
-              content: this.generateSystemPrompt(message.hero),
-            }),
-          ]
-        : []),
+      ...(isFirstMessage ? [JSON.stringify(prompt)] : []),
       JSON.stringify(userQuestion),
       JSON.stringify({
         role: ChatCompletionRequestMessageRoleEnum.Assistant,
