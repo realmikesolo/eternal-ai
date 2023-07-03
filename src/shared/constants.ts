@@ -5,5 +5,6 @@ export const Constants = {
     'What is the meaning of life?',
     'What is your greatest accomplishment?',
   ],
+  GREETINGS: 'Greet the user and propose to share thoughts?',
   CHAT_HISTORY_TTL: 1 * 3600,
 };

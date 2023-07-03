@@ -61,7 +61,10 @@ export class ChatService {
     }
 
     socket.on('chat-history', (message) =>
-      this.getChatHistory(user.id, message.hero).then((data) => socket.emit('chat-history', data.slice(3))),
+      this.getChatHistory(user.id, message.hero).then((data) => {
+        console.log(2, data.slice(2));
+        socket.emit('chat-history', data.slice(2));
+      }),
     );
     socket.on('hero', (message) => this.answerQuestion(user, socket, message));
   }
@@ -70,13 +73,16 @@ export class ChatService {
     userId: string,
     hero: string,
   ): Promise<Array<{ role: ChatCompletionRequestMessageRoleEnum; content: string }>> {
-    return redisClient
+    const chat = redisClient
       .lrange(this.buildRedisMessageKey(userId, hero), 0, -1)
       .then((messages) =>
         messages.map(
           (message) => JSON.parse(message) as { role: ChatCompletionRequestMessageRoleEnum; content: string },
         ),
       );
+
+    console.log(1, chat);
+    return chat;
   }
 
   private async answerQuestion(
@@ -112,7 +118,7 @@ export class ChatService {
     await redisClient.rpush(
       this.buildRedisMessageKey(user.id, message.hero),
       ...(isFirstMessage ? [JSON.stringify(prompt)] : []),
-      JSON.stringify(userQuestion),
+      ...(userQuestion.content === Constants.GREETINGS ? [] : [JSON.stringify(userQuestion)]),
       JSON.stringify({
         role: ChatCompletionRequestMessageRoleEnum.Assistant,
         content,
