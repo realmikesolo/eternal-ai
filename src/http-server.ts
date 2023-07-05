@@ -82,7 +82,16 @@ export async function startHttpServer(options: {
   });
 
   fastify.io.on('connection', async (socket: AuthSocket) => {
-    await chatService.connect(socket);
+    try {
+      await chatService.connect(socket);
+    } catch (e) {
+      console.error(e);
+
+      socket.emit('error', e.message ?? 'Unknown error');
+      socket.emit('my_error', e.message ?? 'Unknown error');
+
+      socket.disconnect(true);
+    }
   });
 
   if (Env.STAGE === 'local') {
