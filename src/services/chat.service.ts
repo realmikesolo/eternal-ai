@@ -70,7 +70,6 @@ export class ChatService {
         console.error(e);
 
         socket.emit('error', e.message ?? 'Unknown error');
-        socket.emit('my_error', e.message ?? 'Unknown error');
       }
     });
   }
@@ -111,12 +110,15 @@ export class ChatService {
       content: this.generateSystemPrompt(message.hero),
     };
 
+    console.time('1openai');
     const content = await openai
       .createChatCompletion({
         model: 'gpt-3.5-turbo',
         messages: [...(isFirstMessage ? [prompt] : chatHistory), userQuestion],
       })
       .then((response) => response.data.choices[0].message!.content);
+
+    console.timeEnd('1openai');
 
     await redisClient.rpush(
       this.buildRedisMessageKey(user.id, message.hero),

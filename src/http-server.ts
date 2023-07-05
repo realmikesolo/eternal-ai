@@ -83,12 +83,13 @@ export async function startHttpServer(options: {
 
   fastify.io.on('connection', async (socket: AuthSocket) => {
     try {
+      console.time('2connect');
       await chatService.connect(socket);
+      console.timeEnd('2connect');
     } catch (e) {
       console.error(e);
 
       socket.emit('error', e.message ?? 'Unknown error');
-      socket.emit('my_error', e.message ?? 'Unknown error');
     }
   });
 
