@@ -71,8 +71,6 @@ export class ChatService {
 
         socket.emit('error', e.message ?? 'Unknown error');
         socket.emit('my_error', e.message ?? 'Unknown error');
-
-        socket.disconnect(true);
       }
     });
   }
