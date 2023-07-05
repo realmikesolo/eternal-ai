@@ -121,8 +121,9 @@ export class ChatService {
 
     const content = await openai
       .createChatCompletion({
-        model: 'text-davinci-003',
+        model: 'gpt-3.5-turbo',
         messages: [...(isFirstMessage ? [prompt] : chatHistory), userQuestion],
+        max_tokens: 100,
       })
       .then((response) => response.data.choices[0].message!.content);
 
