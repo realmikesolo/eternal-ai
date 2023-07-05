@@ -10,6 +10,8 @@ export class ChatService {
   private userRepository = new UserRepository();
 
   public async connect(socket: AuthSocket): Promise<void> {
+    console.time('Time connect');
+    console.time('Time free-questions');
     if (!socket.user) {
       socket.emit('error', 'UNAUTHORIZED');
 
@@ -37,6 +39,7 @@ export class ChatService {
 
       return;
     }
+    console.timeEnd('Time free-questions');
 
     const user = await this.userRepository.getUserById(socket.user.id);
     if (!user) {
@@ -65,13 +68,17 @@ export class ChatService {
     );
     socket.on('hero', async (message) => {
       try {
+        console.time('Time hero');
         await this.answerQuestion(user, socket, message);
+        console.timeEnd('Time hero');
       } catch (e) {
         console.error(e);
 
         socket.emit('error', e.message ?? 'Unknown error');
       }
     });
+
+    console.timeEnd('Time connect');
   }
 
   private async getChatHistory(
@@ -110,7 +117,8 @@ export class ChatService {
       content: this.generateSystemPrompt(message.hero),
     };
 
-    console.time('1openai');
+    console.time('Time openai');
+
     const content = await openai
       .createChatCompletion({
         model: 'gpt-3.5-turbo',
@@ -118,7 +126,7 @@ export class ChatService {
       })
       .then((response) => response.data.choices[0].message!.content);
 
-    console.timeEnd('1openai');
+    console.timeEnd('Time openai');
 
     await redisClient.rpush(
       this.buildRedisMessageKey(user.id, message.hero),
