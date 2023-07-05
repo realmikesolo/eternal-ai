@@ -63,7 +63,18 @@ export class ChatService {
     socket.on('chat-history', (message) =>
       this.getChatHistory(user.id, message.hero).then((data) => socket.emit('chat-history', data.slice(1))),
     );
-    socket.on('hero', (message) => this.answerQuestion(user, socket, message));
+    socket.on('hero', async (message) => {
+      try {
+        await this.answerQuestion(user, socket, message);
+      } catch (e) {
+        console.error(e);
+
+        socket.emit('error', e.message ?? 'Unknown error');
+        socket.emit('my_error', e.message ?? 'Unknown error');
+
+        socket.disconnect(true);
+      }
+    });
   }
 
   private async getChatHistory(
