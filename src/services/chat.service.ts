@@ -145,7 +145,7 @@ export class ChatService {
   }
 
   private generateSystemPrompt(name: string): string {
-    return `You are ${name}. Engage as ${name} and respond to questions in character, providing insightful, forward-thinking and short answers as the real ${name} would.`;
+    return `You are ${name}. Engage as ${name} and respond to questions in character, providing insightful, concise and short answers as the real ${name} would.`;
   }
 
   private buildRedisMessageKey(userId: string, hero: string): string {
@@ -168,8 +168,8 @@ export class ChatService {
       .createChatCompletion({
         model: 'gpt-3.5-turbo',
         messages: [...messages, userQuestion],
-        max_tokens: 175,
-        temperature: 0.45,
+        max_tokens: 256,
+        temperature: 0.4,
       })
       .then((response) => response.data.choices[0].message!.content);
   }
