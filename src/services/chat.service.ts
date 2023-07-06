@@ -10,8 +10,6 @@ export class ChatService {
   private userRepository = new UserRepository();
 
   public async connect(socket: AuthSocket): Promise<void> {
-    console.time('Time connect');
-    console.time('Time free-questions');
     if (!socket.user) {
       socket.emit('error', 'UNAUTHORIZED');
 
@@ -20,26 +18,32 @@ export class ChatService {
           return socket.emit('error', 'UNAUTHORIZED');
         }
 
-        const userQuestion = { role: ChatCompletionRequestMessageRoleEnum.User, content: message.question };
+        const userQuestion = {
+          role: ChatCompletionRequestMessageRoleEnum.User,
+          content: message.question,
+        };
 
         const systemPrompt = {
           role: ChatCompletionRequestMessageRoleEnum.System,
           content: this.generateSystemPrompt(message.hero),
         };
 
-        const content = await openai
-          .createChatCompletion({
-            model: 'gpt-3.5-turbo',
-            messages: [systemPrompt, userQuestion],
-          })
-          .then((response) => response.data.choices[0].message!.content);
+        // const content = await openai
+        //   .createChatCompletion({
+        //     model: 'gpt-3.5-turbo',
+        //     messages: [systemPrompt, userQuestion],
+        //     max_tokens: 175,
+        //     temperature: 0.45,
+        //   })
+        //   .then((response) => response.data.choices[0].message!.content);
+
+        const content = await this.getAnswerFromOpenAI([systemPrompt], userQuestion);
 
         socket.emit('heroResponse', content);
       });
 
       return;
     }
-    console.timeEnd('Time free-questions');
 
     const user = await this.userRepository.getUserById(socket.user.id);
     if (!user) {
@@ -68,30 +72,19 @@ export class ChatService {
     );
     socket.on('hero', async (message) => {
       try {
-        console.time('Time hero');
         await this.answerQuestion(user, socket, message);
-        console.timeEnd('Time hero');
       } catch (e) {
         console.error(e);
 
         socket.emit('error', e.message ?? 'Unknown error');
       }
     });
-
-    console.timeEnd('Time connect');
   }
 
-  private async getChatHistory(
-    userId: string,
-    hero: string,
-  ): Promise<Array<{ role: ChatCompletionRequestMessageRoleEnum; content: string }>> {
+  private async getChatHistory(userId: string, hero: string): Promise<ChatMessage[]> {
     return redisClient
       .lrange(this.buildRedisMessageKey(userId, hero), 0, -1)
-      .then((messages) =>
-        messages.map(
-          (message) => JSON.parse(message) as { role: ChatCompletionRequestMessageRoleEnum; content: string },
-        ),
-      );
+      .then((messages) => messages.map((message) => JSON.parse(message) as ChatMessage));
   }
 
   private async answerQuestion(
@@ -117,17 +110,16 @@ export class ChatService {
       content: this.generateSystemPrompt(message.hero),
     };
 
-    console.time('Time openai');
+    // const content = await openai
+    //   .createChatCompletion({
+    //     model: 'gpt-3.5-turbo',
+    //     messages: [...(isFirstMessage ? [prompt] : chatHistory), userQuestion],
+    //     max_tokens: 175,
+    //     temperature: 0.45,
+    //   })
+    //   .then((response) => response.data.choices[0].message!.content);
 
-    const content = await openai
-      .createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: [...(isFirstMessage ? [prompt] : chatHistory), userQuestion],
-        max_tokens: 100,
-      })
-      .then((response) => response.data.choices[0].message!.content);
-
-    console.timeEnd('Time openai');
+    const content = await this.getAnswerFromOpenAI(isFirstMessage ? [prompt] : chatHistory, userQuestion);
 
     await redisClient.rpush(
       this.buildRedisMessageKey(user.id, message.hero),
@@ -153,7 +145,7 @@ export class ChatService {
   }
 
   private generateSystemPrompt(name: string): string {
-    return `You are ${name}. Engage as ${name} and respond to questions in character, providing insightful and forward-thinking answers as the real ${name} would.`;
+    return `You are ${name}. Engage as ${name} and respond to questions in character, providing insightful, forward-thinking and short answers as the real ${name} would.`;
   }
 
   private buildRedisMessageKey(userId: string, hero: string): string {
@@ -167,4 +159,23 @@ export class ChatService {
   private transformHeroName(name: string): string {
     return name.replaceAll(' ', '');
   }
+
+  private async getAnswerFromOpenAI(
+    messages: ChatMessage[],
+    userQuestion: ChatMessage,
+  ): Promise<string | undefined> {
+    return openai
+      .createChatCompletion({
+        model: 'gpt-3.5-turbo',
+        messages: [...messages, userQuestion],
+        max_tokens: 175,
+        temperature: 0.45,
+      })
+      .then((response) => response.data.choices[0].message!.content);
+  }
 }
+
+type ChatMessage = {
+  role: ChatCompletionRequestMessageRoleEnum;
+  content: string;
+};
