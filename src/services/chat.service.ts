@@ -123,7 +123,6 @@ export class ChatService {
       .createChatCompletion({
         model: 'gpt-3.5-turbo',
         messages: [prompt, userQuestion],
-        max_tokens: 175,
         temperature: 0.4,
       })
       .then((response) => response.data.choices[0].message!.content);
