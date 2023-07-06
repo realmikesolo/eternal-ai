@@ -87,7 +87,7 @@ export async function startHttpServer(options: {
     } catch (e) {
       console.error(e);
 
-      socket.emit('error', e.message ?? 'Unknown error');
+      socket.emit('error', e.message ?? 'Unknown error with connection');
     }
   });
 

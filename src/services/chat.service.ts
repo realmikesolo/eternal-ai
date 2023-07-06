@@ -28,15 +28,6 @@ export class ChatService {
           content: this.generateSystemPrompt(message.hero),
         };
 
-        // const content = await openai
-        //   .createChatCompletion({
-        //     model: 'gpt-3.5-turbo',
-        //     messages: [systemPrompt, userQuestion],
-        //     max_tokens: 175,
-        //     temperature: 0.45,
-        //   })
-        //   .then((response) => response.data.choices[0].message!.content);
-
         const content = await this.getAnswerFromOpenAI([systemPrompt], userQuestion);
 
         socket.emit('heroResponse', content);
@@ -68,7 +59,7 @@ export class ChatService {
     }
 
     socket.on('chat-history', (message) =>
-      this.getChatHistory(user.id, message.hero).then((data) => socket.emit('chat-history', data.slice(1))),
+      this.getChatHistory(user.id, message.hero).then((data) => socket.emit('chat-history', data)),
     );
     socket.on('hero', async (message) => {
       try {
@@ -76,7 +67,7 @@ export class ChatService {
       } catch (e) {
         console.error(e);
 
-        socket.emit('error', e.message ?? 'Unknown error');
+        socket.emit('error', e.message ?? 'Unknown error with chat');
       }
     });
   }
@@ -102,7 +93,6 @@ export class ChatService {
     }
 
     const chatHistory = await this.getChatHistory(user.id, message.hero);
-    const isFirstMessage = !chatHistory?.length;
 
     const userQuestion = { role: ChatCompletionRequestMessageRoleEnum.User, content: message.question };
     const prompt = {
@@ -110,28 +100,10 @@ export class ChatService {
       content: this.generateSystemPrompt(message.hero),
     };
 
-    // const content = await openai
-    //   .createChatCompletion({
-    //     model: 'gpt-3.5-turbo',
-    //     messages: [...(isFirstMessage ? [prompt] : chatHistory), userQuestion],
-    //     max_tokens: 175,
-    //     temperature: 0.45,
-    //   })
-    //   .then((response) => response.data.choices[0].message!.content);
-
-    const content = await openai
-      .createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: [prompt, userQuestion],
-        temperature: 0.4,
-      })
-      .then((response) => response.data.choices[0].message!.content);
-
-    // const content = await this.getAnswerFromOpenAI(isFirstMessage ? [prompt] : chatHistory, userQuestion);
+    const content = await this.getAnswerFromOpenAI([prompt, ...chatHistory.slice(-2)], userQuestion);
 
     await redisClient.rpush(
       this.buildRedisMessageKey(user.id, message.hero),
-      ...(isFirstMessage ? [JSON.stringify(prompt)] : []),
       ...(userQuestion.content === Constants.GREETINGS ? [] : [JSON.stringify(userQuestion)]),
       JSON.stringify({
         role: ChatCompletionRequestMessageRoleEnum.Assistant,
@@ -139,7 +111,7 @@ export class ChatService {
       }),
     );
 
-    if (isFirstMessage) {
+    if (!chatHistory?.length) {
       await redisClient.expire(this.buildRedisMessageKey(user.id, message.hero), Constants.CHAT_HISTORY_TTL);
     }
 
