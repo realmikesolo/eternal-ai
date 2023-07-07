@@ -100,7 +100,7 @@ export class ChatService {
       content: this.generateSystemPrompt(message.hero),
     };
 
-    const content = await this.getAnswerFromOpenAI([prompt, ...chatHistory.slice(-2)], userQuestion);
+    const content = await this.getAnswerFromOpenAI([...chatHistory.slice(-1)], userQuestion);
 
     await redisClient.rpush(
       this.buildRedisMessageKey(user.id, message.hero),
